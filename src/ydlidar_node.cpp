@@ -15,12 +15,12 @@
 #include <string>
 #include <signal.h>
 
-#define DELAY_SECONDS 2
+#define DELAY_SECONDS 20
 #define DEG2RAD(x) ((x)*M_PI/180.)
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.2"
+#define ROSVerision "1.3.3"
 
 static bool flag = true;
 static int nodes_count = 720;
@@ -110,7 +110,7 @@ bool getDeviceInfo(std::string port , int& samp_rate, double _frequency, int bau
     device_info devinfo;
     if (YDlidarDriver::singleton()->getDeviceInfo(devinfo,1000) !=RESULT_OK){
         if(print==3)
-            ROS_ERROR("YDLIDAR get DeviceInfo Error\n" );
+            ROS_ERROR("YDLIDAR get DeviceInfo Error" );
         return false;
     }
     sampling_rate _rate;
@@ -173,7 +173,7 @@ bool getDeviceInfo(std::string port , int& samp_rate, double _frequency, int bau
                 }
 
                 if (YDlidarDriver::singleton()->getScanFrequency(_scan_frequency) != RESULT_OK){
-                    ROS_ERROR("YDLIDAR get frequency Error\n" );
+                    ROS_ERROR("YDLIDAR get frequency Error" );
                     return false;
                 }
                 freq = _scan_frequency.frequency/100;
@@ -276,8 +276,8 @@ bool getDeviceInfo(std::string port , int& samp_rate, double _frequency, int bau
     }
     printf("\n");
 
-    printf("[YDLIDAR INFO] Current Sampling Rate : %dK\n" , _samp_rate);
-    printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq);
+    ROS_INFO("[YDLIDAR INFO] Current Sampling Rate : %dK" , _samp_rate);
+    ROS_INFO("[YDLIDAR INFO] Current Scan Frequency : %fHz" , freq);
 
     return true;
 
@@ -319,16 +319,18 @@ int main(int argc, char * argv[]) {
 
     std::string port;
     int baudrate=115200;
+    int ori_baudrate = 115200;
     std::string model;
     std::string frame_id;
     bool angle_fixed, intensities_,low_exposure,reversion, resolution_fixed,heartbeat;
-    bool auto_reconnect;
+    bool auto_reconnect, debug;
     double angle_max,angle_min;
     result_t op_result;
     int samp_rate;
+    int wait_delay;
     std::string list;
     std::vector<double> ignore_array;  
-    double max_range , min_range;
+    double max_range, min_range;
     double _frequency;
 
     ros::NodeHandle nh;
@@ -342,15 +344,18 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("heartbeat", heartbeat, "false");
     nh_private.param<bool>("low_exposure", low_exposure, "false");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
+    nh_private.param<bool>("debug", debug, "false");
+    nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
     nh_private.param<int>("samp_rate", samp_rate, 4); 
+    nh_private.param<int>("wait_delay", wait_delay, 0); 
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", _frequency , 7.0);
     nh_private.param<std::string>("ignore_array",list,"");
     ignore_array = split(list ,',');
-    reversion = false;
+    ori_baudrate = baudrate;
 
     if(ignore_array.size()%2){
         ROS_ERROR_STREAM("ignore array is odd need be even");
@@ -364,7 +369,7 @@ int main(int argc, char * argv[]) {
 
     YDlidarDriver::initDriver(); 
     if (!YDlidarDriver::singleton()) {
-        ROS_ERROR("YDLIDAR Create Driver fail, exit\n");
+        ROS_ERROR("YDLIDAR Create Driver fail, exit");
         return -2;
     }
 
@@ -386,12 +391,13 @@ int main(int argc, char * argv[]) {
     checkmodel.insert(std::map<int, bool>::value_type(128000, false));
     checkmodel.insert(std::map<int, bool>::value_type(153600, false));
     checkmodel.insert(std::map<int, bool>::value_type(230400, false));
-    printf("[YDLIDAR INFO] Current ROS Driver Version: %s\n",((std::string)ROSVerision).c_str());
-    printf("[YDLIDAR INFO] Current SDK Version: %s\n",YDlidarDriver::singleton()->getSDKVersion().c_str());
+    ROS_INFO("[YDLIDAR INFO] Current ROS Driver Version: %s",((std::string)ROSVerision).c_str());
+    ROS_INFO("[YDLIDAR INFO] Current SDK Version: %s",YDlidarDriver::singleton()->getSDKVersion().c_str());
 
 
 
 again:
+    YDlidarDriver::singleton()->setSaveParse(debug, "/tmp/ydldiar_scan.txt");
     op_result = YDlidarDriver::singleton()->connect(port.c_str(), (uint32_t)baudrate);
     if (op_result != RESULT_OK) {
         int seconds=0;
@@ -400,7 +406,7 @@ again:
             seconds = seconds + 2;
             YDlidarDriver::singleton()->disconnect();
             op_result = YDlidarDriver::singleton()->connect(port.c_str(), (uint32_t)baudrate);
-            printf("[YDLIDAR INFO] Try to connect the port %s again  after %d s .\n", port.c_str() , seconds);
+            ROS_INFO("[YDLIDAR INFO] Try to connect the port %s again  after %d s .", port.c_str() , seconds);
             if(op_result==RESULT_OK){
                 break;
             }
@@ -426,20 +432,37 @@ again:
             YDlidarDriver::done();
             YDlidarDriver::initDriver(); 
             if (!YDlidarDriver::singleton()) {
-                ROS_ERROR("YDLIDAR Create Driver fail, exit\n");
+                ROS_ERROR("YDLIDAR Create Driver fail, exit");
                 return -1;
             }
             baudrate = it->first;
             goto again;
 
         }
+        if(wait_delay >0 ) {
+            sleep(wait_delay);
+            wait_delay = 0;
+            YDlidarDriver::singleton()->disconnect();
+            YDlidarDriver::done();
+            YDlidarDriver::initDriver(); 
+            if (!YDlidarDriver::singleton()) {
+                ROS_ERROR("YDLIDAR Create Driver fail in wait delay, exit");
+                return -1;
+            }
+            for(it=checkmodel.begin();it!=checkmodel.end();++it){
+                 checkmodel[it->first] = false;
+            }
+            baudrate = ori_baudrate;
 
-        ROS_ERROR("[YDLIDAR ERROR] Unsupported lidar\n");
+
+        }
+
+        ROS_ERROR("[YDLIDAR ERROR] Unsupported lidar");
         YDlidarDriver::singleton()->disconnect();
         YDlidarDriver::done();
         return -1;
     }
-    printf("[YDLIDAR INFO] Connected to YDLIDAR on port %s at %d \n" , port.c_str(), baudrate);
+    ROS_INFO("[YDLIDAR INFO] Connected to YDLIDAR on port %s at %d " , port.c_str(), baudrate);
     print = 0;
 
     if(type !=4){
@@ -470,26 +493,6 @@ again:
     }
 
     if(type == 5 || type == 8 || type == 9){
-         scan_heart_beat beat;
-         if(type != 8)
-            reversion=true;
-        result_t ans = YDlidarDriver::singleton()->setScanHeartbeat(beat);
-        if(heartbeat){
-            if(beat.enable&& ans == RESULT_OK){
-                ans = YDlidarDriver::singleton()->setScanHeartbeat(beat);
-            }
-            if(!beat.enable&& ans == RESULT_OK ){
-                YDlidarDriver::singleton()->setHeartBeat(true);
-            }
-        }else{
-            if(!beat.enable&& ans == RESULT_OK){
-                ans = YDlidarDriver::singleton()->setScanHeartbeat(beat);
-            }
-            if(beat.enable && ans==RESULT_OK){
-                YDlidarDriver::singleton()->setHeartBeat(false);
-            }
-
-        }
 
         if(_frequency < 7 && samp_rate>6){
             nodes_count = 1600;
@@ -511,7 +514,7 @@ again:
         }
     }
 	YDlidarDriver::singleton()->setAutoReconnect(auto_reconnect);
-    printf("[YDLIDAR INFO] Now YDLIDAR is scanning ......\n");
+    ROS_INFO("[YDLIDAR INFO] Now YDLIDAR is scanning ......\n");
     flag = false;
     ros::Time start_scan_time;
     ros::Time end_scan_time;
