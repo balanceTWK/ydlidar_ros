@@ -104,9 +104,13 @@ frequency (double, default: 7)
 
 Upgrade Log
 =====================================================================
+
 2018-06-19 version:1.3.3
+
    1.Update SDK verison to 1.3.5
+
    2.add debug MODEL
+
    3.add reversion scan data
 
 2018-04-16 version:1.3.1
