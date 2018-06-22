@@ -453,6 +453,7 @@ again:
                  checkmodel[it->first] = false;
             }
             baudrate = ori_baudrate;
+	    goto again;
 
 
         }
