@@ -31,6 +31,7 @@ namespace ydlidar{
 		_sampling_rate=-1;
 		model = -1;
         firmware_version = 0;
+		scan_node_count  = 0;
 
         //解析参数
         PackageSampleBytes = 2;
@@ -94,7 +95,11 @@ namespace ydlidar{
 		}
 
 		isConnected = true;
-
+		{
+			ScopedLocker l(_lock);
+			sendCommand(LIDAR_CMD_FORCE_STOP);
+			sendCommand(LIDAR_CMD_STOP);
+		}
 		clearDTR();
 
 		return RESULT_OK;
@@ -379,7 +384,6 @@ namespace ydlidar{
                             if(_serial){
 								ScopedLocker l(_lock);
                                 if(_serial->isOpen()){
-									sendCommand(LIDAR_CMD_STOP);
                                     _serial->close();
 
                                 }
@@ -788,8 +792,8 @@ namespace ydlidar{
 				if(scan_node_count == 0) {
 					return RESULT_FAIL;
 				}
-				size_t size_to_copy = min(count, scan_node_count);
 				ScopedLocker l(_lock);
+				size_t size_to_copy = min(count, scan_node_count);
 				memcpy(nodebuffer, scan_node_buf, size_to_copy*sizeof(node_info));
 				count = size_to_copy;
 				scan_node_count = 0;
@@ -1232,7 +1236,7 @@ namespace ydlidar{
 		disableDataGrabbing();
 		{
 			ScopedLocker l(_lock);
-			sendCommand(LIDAR_CMD_STOP);
+			sendCommand(LIDAR_CMD_FORCE_STOP);
 			sendCommand(LIDAR_CMD_STOP);
 		}
 
