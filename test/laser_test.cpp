@@ -233,7 +233,7 @@ void Lasertest::Start() {
                 if (op_result == RESULT_OK) {
                     memset(all_nodes, 0, nodes_count*sizeof(node_info));
                     for(size_t i =0 ; i < count; i++) {
-                        if (nodes[i].distance_q2 != 0) {
+                        if (nodes[i].distance_q != 0) {
                             float angle = (float)((nodes[i].angle_q6_checkbit >> LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f);
                             int inter =(int)( angle / each_angle );
                             float angle_pre = angle - inter * each_angle;
@@ -323,8 +323,8 @@ void Lasertest::publicScanData(node_info *nodes, uint64_t start,double scan_time
     float intensity = 0.0;
     int index = 0;
     for (size_t i = 0; i < node_count; i++) {
-	range = (float)nodes[i].distance_q2/4.0f/1000;
-	intensity = (float)(nodes[i].sync_quality >> 2);
+	range = (float)nodes[i].distance_q/1000.f;
+	intensity = (float)(nodes[i].sync_quality >> LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
 
         if(i<node_count/2){
 	    index = node_count/2-1-i;	    

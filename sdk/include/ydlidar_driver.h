@@ -36,8 +36,12 @@
 #define LIDAR_ANS_TYPE_MEASUREMENT          0x81
 #define LIDAR_RESP_MEASUREMENT_SYNCBIT        (0x1<<0)
 #define LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT  2
+#define LIDAR_RESP_MEASUREMENT_SYNC_QUALITY_SHIFT  8
 #define LIDAR_RESP_MEASUREMENT_CHECKBIT       (0x1<<0)
 #define LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT    1
+#define LIDAR_RESP_MEASUREMENT_ANGLE_SAMPLE_SHIFT    8
+#define LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT  2
+#define LIDAR_RESP_MEASUREMENT_DISTANCE_HALF_SHIFT 1
 
 #define LIDAR_CMD_RUN_POSITIVE             0x06
 #define LIDAR_CMD_RUN_INVERSION            0x07
@@ -73,7 +77,7 @@ typedef enum {
 	CT_RingStart  = 1,
 	CT_Tail,
 }CT;
-#define Node_Default_Quality (10<<2)
+#define Node_Default_Quality (10)
 #define Node_Sync 1
 #define Node_NotSync 2
 #define PackagePaidBytes 10
@@ -84,9 +88,11 @@ typedef enum {
 #endif
 
 struct node_info {
-    uint8_t    sync_quality;//!信号质量
+    uint8_t    sync_flag;
+    uint16_t   sync_quality;//!信号质量
     uint16_t   angle_q6_checkbit; //!测距点角度
-    uint16_t   distance_q2; //! 当前测距点距离
+    uint16_t   ori_angle_q6_checkbit; //!测距点角度
+    uint16_t   distance_q; //! 当前测距点距离
     uint64_t   stamp; //! 时间戳
     uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0, 当前扫描频率current_frequence = scan_frequence/10.0
 } __attribute__((packed)) ;
@@ -332,6 +338,19 @@ namespace ydlidar{
 		 * @filename 保存文件名
          */
 		bool setSaveParse(bool parse, const std::string& filename);
+
+ 		/**
+         * @brief 设置雷达采样倍频 \n
+         * @param[in] enable    是否开启采样倍频:
+         *     true	开启
+         *	  false 关闭
+         */
+        void setMultipleRate(const bool& enable);
+
+		/**
+		 * @brief 检测传输时间 \n
+		 * */
+		void checkTransTime();
 
 		/**
 		* @brief 获取雷达设备健康状态 \n
@@ -802,27 +821,58 @@ namespace ydlidar{
 		std::atomic<bool>     save_parsing;
 
 		enum {
-			DEFAULT_TIMEOUT = 2000,    /**< 默认超时时间. */ 
-			DEFAULT_HEART_BEAT = 1000, /**< 默认检测掉电功能时间. */ 
-			MAX_SCAN_NODES = 2048,	   /**< 最大扫描点数. */ 
+			DEFAULT_TIMEOUT 	= 2000,    /**< 默认超时时间. */ 
+			DEFAULT_HEART_BEAT 	= 1000, /**< 默认检测掉电功能时间. */ 
+			MAX_SCAN_NODES 		= 3600,	   /**< 最大扫描点数. */ 
 		};
 		enum { 
-			YDLIDAR_F4=1, /**< F4雷达型号代号. */ 
-			YDLIDAR_T1=2, /**< T1雷达型号代号. */ 
-			YDLIDAR_F2=3, /**< F2雷达型号代号. */ 
-			YDLIDAR_S4=4, /**< S4雷达型号代号. */ 
-			YDLIDAR_G4=5, /**< G4雷达型号代号. */ 
-			YDLIDAR_X4=6, /**< X4雷达型号代号. */ 
-			YDLIDAR_F4PRO=6, /**< F4PRO雷达型号代号. */ 
-			YDLIDAR_G4C=9, /**< G4C雷达型号代号. */ 
+			YDLIDAR_F4			= 1, /**< F4雷达型号代号. */ 
+			YDLIDAR_T1			= 2, /**< T1雷达型号代号. */ 
+			YDLIDAR_F2			= 3, /**< F2雷达型号代号. */ 
+			YDLIDAR_S4			= 4, /**< S4雷达型号代号. */ 
+			YDLIDAR_G4			= 5, /**< G4雷达型号代号. */ 
+			YDLIDAR_X4			= 6, /**< X4雷达型号代号. */ 
+			YDLIDAR_G4PRO		= 7, /**< G4PRO雷达型号代号. */ 
+			YDLIDAR_F4PRO		= 8, /**< F4PRO雷达型号代号. */ 
+			YDLIDAR_G4C			= 9, /**< G4C雷达型号代号. */ 
+			YDLIDAR_G10			= 10,/**< G10雷达型号代号. */ 
+            YDLIDAR_S4B 		= 11,/**< S4B雷达型号代号. */ 
+            YDLIDAR_S2 			= 12,/**< S2雷达型号代号. */ 
+            YDLIDAR_G25 		= 13,/**< G25雷达型号代号. */ 
+            YDLIDAR_Tail,/**< 雷达型号代号. */ 
 
 		};
-		node_info      scan_node_buf[2048];  ///< 激光点信息
-		size_t         scan_node_count;      ///< 激光点数
-		Event          _dataEvent;			 ///< 数据同步事件
-		Locker         _lock;				///< 线程锁
-        Locker _serial_lock;                ///< 串口锁
-		Thread 	       _thread;				///< 线程id
+
+		enum {
+            YDLIDAR_RATE_4K 	= 0,
+            YDLIDAR_RATE_8K 	= 1,
+            YDLIDAR_RATE_9K 	= 2,
+            YDLIDAR_RATE_10K 	= 3,
+        };
+
+		enum { 
+			YDLIDAR_F4_BAUD		= 115200, /**< F4雷达型号波特率. */ 
+			YDLIDAR_T1_BAUD		= 115200, /**< T1雷达型号波特率. */ 
+			YDLIDAR_F2_BAUD		= 115200, /**< F2雷达型号波特率. */ 
+			YDLIDAR_S4_BAUD		= 115200, /**< S4雷达型号波特率. */ 
+			YDLIDAR_G4_BAUD		= 230400, /**< G4雷达型号波特率. */ 
+			YDLIDAR_X4_BAUD		= 128000, /**< X4雷达型号波特率. */ 
+			YDLIDAR_G4PRO_BAUD	= 230400, /**< G4PRO雷达型号波特率. */ 
+			YDLIDAR_F4PRO_BAUD	= 128000, /**< F4PRO雷达型号波特率. */ 
+			YDLIDAR_G4C_BAUD	= 115200, /**< G4C雷达型号波特率. */ 
+			YDLIDAR_G10_BAUD	= 230400,/**< G10雷达型号波特率. */ 
+            YDLIDAR_S4B_BAUD 	= 153600,/**< S4B雷达型号波特率. */ 
+            YDLIDAR_S2_BAUD 	= 115200,/**< S2雷达型号波特率. */ 
+            YDLIDAR_G25_BAUD 	= 512000,/**< G25雷达型号波特率. */ 
+
+		};
+
+		node_info      	scan_node_buf[3600];  ///< 激光点信息
+		size_t         	scan_node_count;      ///< 激光点数
+		Event          	_dataEvent;			 ///< 数据同步事件
+		Locker         	_lock;				///< 线程锁
+        Locker 			_serial_lock;                ///< 串口锁
+		Thread 	       	_thread;				///< 线程id
 
 	private:
         int PackageSampleBytes;             ///< 一个包包含的激光点数
@@ -854,6 +904,7 @@ namespace ydlidar{
         uint16_t LastSampleAngleCal;
         bool CheckSunResult;
         uint16_t Valu8Tou16;
+		bool isMultipleRate;
 
         std::string serial_port;///< 雷达端口
 
