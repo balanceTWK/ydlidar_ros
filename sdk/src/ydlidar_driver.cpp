@@ -78,18 +78,20 @@ namespace ydlidar{
 	result_t YDlidarDriver::connect(const char * port_path, uint32_t baudrate) {
 		_baudrate = baudrate;
         serial_port = string(port_path);
-        ScopedLocker lk(_serial_lock);
-		if(!_serial){
-			_serial = new serial::Serial(port_path, _baudrate, serial::Timeout::simpleTimeout(DEFAULT_TIMEOUT));
-		}
+        {
+			ScopedLocker lk(_serial_lock);
+			if(!_serial){
+				_serial = new serial::Serial(port_path, _baudrate, serial::Timeout::simpleTimeout(DEFAULT_TIMEOUT));
+			}
 
-		{
-			ScopedLocker l(_lock);
-			if(!_serial->open()){
-				if (NULL != fd&& save_parsing){			
-					fprintf(fd, "connect %s failed in %d\n", port_path, baudrate);         
+			{
+				ScopedLocker l(_lock);
+				if(!_serial->open()){
+					if (NULL != fd&& save_parsing){			
+						fprintf(fd, "connect %s failed in %d\n", port_path, baudrate);         
+					}
+					return RESULT_FAIL;
 				}
-				return RESULT_FAIL;
 			}
 		}
 		if (NULL != fd&& save_parsing){			
@@ -713,25 +715,21 @@ namespace ydlidar{
 			if(m_intensities){
 				if(isMultipleRate) {
 					(*node).sync_quality = (((package.packageSample[package_Sample_Index].PakageSampleDistance&(0x00<< LIDAR_RESP_MEASUREMENT_DISTANCE_HALF_SHIFT))<<LIDAR_RESP_MEASUREMENT_SYNC_QUALITY_SHIFT)| (package.packageSample[package_Sample_Index].PakageSampleQuality));
-					(*node).distance_q = package.packageSample[package_Sample_Index].PakageSampleDistance >>LIDAR_RESP_MEASUREMENT_DISTANCE_HALF_SHIFT;
 				} else {
 					(*node).sync_quality = (((package.packageSample[package_Sample_Index].PakageSampleDistance&(0x00<< LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT))<<LIDAR_RESP_MEASUREMENT_SYNC_QUALITY_SHIFT)| (package.packageSample[package_Sample_Index].PakageSampleQuality));
-					(*node).distance_q = package.packageSample[package_Sample_Index].PakageSampleDistance >> LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT;
 				}
+				(*node).distance_q2 = package.packageSample[package_Sample_Index].PakageSampleDistance;
 			}else{
-				if(isMultipleRate) {
-					(*node).distance_q = packages.packageSampleDistance[package_Sample_Index] >>LIDAR_RESP_MEASUREMENT_DISTANCE_HALF_SHIFT;
-				} else {
-					(*node).distance_q = packages.packageSampleDistance[package_Sample_Index] >> LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT;
-				}
+								
+				(*node).distance_q2 = packages.packageSampleDistance[package_Sample_Index];
 			}	  
 
 		
-			if((*node).distance_q != 0){
+			if((*node).distance_q2 != 0){
 				if(isMultipleRate) {
-					AngleCorrectForDistance = (int32_t)(((atan(((21.8*(155.3 - ((*node).distance_q)) )/155.3)/((*node).distance_q)))*180.0/3.1415) * 64.0);
+					AngleCorrectForDistance = (int32_t)(((atan(((21.8*(155.3 - ((*node).distance_q2/2.0)) )/155.3)/((*node).distance_q2/2.0)))*180.0/3.1415) * 64.0);
 				}else {
-					AngleCorrectForDistance = (int32_t)(((atan(((21.8*(155.3 - ((*node).distance_q)) )/155.3)/((*node).distance_q)))*180.0/3.1415) * 64.0);
+					AngleCorrectForDistance = (int32_t)(((atan(((21.8*(155.3 - ((*node).distance_q2/4.0)) )/155.3)/((*node).distance_q2/4.0)))*180.0/3.1415) * 64.0);
 				}
 			}else{
 				AngleCorrectForDistance = 0;		
@@ -762,7 +760,7 @@ namespace ydlidar{
             (*node).sync_quality = Node_Default_Quality;
 			(*node).angle_q6_checkbit = LIDAR_RESP_MEASUREMENT_CHECKBIT;
             (*node).ori_angle_q6_checkbit = LIDAR_RESP_MEASUREMENT_CHECKBIT;
-			(*node).distance_q = 0;
+			(*node).distance_q2 = 0;
 		}
 
 
@@ -844,10 +842,10 @@ namespace ydlidar{
 		scan_data->clear();
 		for (int pos = 0; pos < (int)count; ++pos) {
 			scanDot dot;
-			if (!buffer[pos].distance_q) continue;
+			if (!buffer[pos].distance_q2) continue;
 			dot.quality = (buffer[pos].sync_quality>>LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
 			dot.angle = (buffer[pos].angle_q6_checkbit >> LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f;
-			dot.dist = buffer[pos].distance_q;
+			dot.dist = buffer[pos].distance_q2;
 			scan_data->push_back(dot);
 		}
 	}
@@ -857,7 +855,7 @@ namespace ydlidar{
 		int i = 0;
 
 		for (i = 0; i < (int)count; i++) {
-			if(nodebuffer[i].distance_q == 0) {
+			if(nodebuffer[i].distance_q2 == 0) {
 				continue;
 			} else {
 				while(i != 0) {
@@ -876,7 +874,7 @@ namespace ydlidar{
 		}
 
 		for (i = (int)count - 1; i >= 0; i--) {
-			if(nodebuffer[i].distance_q == 0) {
+			if(nodebuffer[i].distance_q2 == 0) {
 				continue;
 			} else {
 				while(i != ((int)count - 1)) {
@@ -892,7 +890,7 @@ namespace ydlidar{
 
 		float frontAngle = (nodebuffer[0].angle_q6_checkbit >> LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f;
 		for (i = 1; i < (int)count; i++) {
-			if(nodebuffer[i].distance_q == 0) {
+			if(nodebuffer[i].distance_q2 == 0) {
 				float expect_angle =  frontAngle + i * inc_origin_angle;
 				if (expect_angle > 360.0f) expect_angle -= 360.0f;
 				uint16_t checkbit = nodebuffer[i].angle_q6_checkbit & LIDAR_RESP_MEASUREMENT_CHECKBIT;
@@ -1063,6 +1061,10 @@ namespace ydlidar{
          */
     void YDlidarDriver::setMultipleRate(const bool& enable) {
 		isMultipleRate = enable;
+	}
+
+	bool YDlidarDriver::getMultipleRate() const {
+		return isMultipleRate;
 	}
 
 	/************************************************************************/

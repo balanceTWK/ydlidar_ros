@@ -33,6 +33,7 @@ CYdLidar::CYdLidar()
     node_counts         = 720;
     each_angle          = 0.5;
     show_error          = 0;
+    m_isMultipleRate    = false;
     m_IgnoreArray.clear();
 }
 
@@ -97,7 +98,7 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError){
             memset(angle_compensate_nodes, 0, all_nodes_counts*sizeof(node_info));
             unsigned int i = 0;
             for( ; i < count; i++) {
-                if (nodes[i].distance_q != 0) {
+                if (nodes[i].distance_q2 != 0) {
                     float angle = (float)((nodes[i].angle_q6_checkbit >> LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f);
                     if(m_Reversion){
                        angle=angle+180;
@@ -138,7 +139,11 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError){
 
 
             for (size_t i = 0; i < all_nodes_counts; i++) {
-                range = (float)angle_compensate_nodes[i].distance_q/1000.f;
+                if(m_isMultipleRate) {
+                    range = (float)angle_compensate_nodes[i].distance_q2/2000.f;
+                }else {
+                    range = (float)angle_compensate_nodes[i].distance_q2/4000.f;
+                }
                 intensity = (float)(angle_compensate_nodes[i].sync_quality >> LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
 
                 if (i<all_nodes_counts/2) {
@@ -272,7 +277,7 @@ bool CYdLidar::getDeviceInfo(int &type) {
     result_t ans;
     int bad = 0;
 
-    YDlidarDriver::singleton()->setMultipleRate(false);
+    m_isMultipleRate = false;
     type = devinfo.model;
     switch (devinfo.model) {
         case YDlidarDriver::YDLIDAR_F4:
@@ -451,7 +456,8 @@ bool CYdLidar::getDeviceInfo(int &type) {
 
 
             }
-            YDlidarDriver::singleton()->setMultipleRate(true);
+            m_isMultipleRate = true;
+
             break;
         default:
             model = "Unknown";
@@ -459,6 +465,7 @@ bool CYdLidar::getDeviceInfo(int &type) {
     }
 
     m_SampleRate = _samp_rate;
+    YDlidarDriver::singleton()->setMultipleRate(m_isMultipleRate);
 
 
 
@@ -491,7 +498,7 @@ bool CYdLidar::getDeviceInfo(int &type) {
             checkScanFrequency();
             checkHeartBeat();
         } else {
-            printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq);
+            printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq-0.4);
         }
 
 		return true;
@@ -553,7 +560,7 @@ bool CYdLidar::checkScanFrequency()
         each_angle = 360.0/node_counts;
     }
 
-    printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq);
+    printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq - 0.4);
 
     return true;
 

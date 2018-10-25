@@ -106,5 +106,6 @@ private:
     int node_counts ;
     double each_angle;
     int show_error;
+    bool m_isMultipleRate;
 };	// End of class
 
