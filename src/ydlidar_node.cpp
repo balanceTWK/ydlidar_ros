@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.6"
+#define ROSVerision "1.3.7"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -38,6 +38,7 @@ int main(int argc, char * argv[]) {
     int baudrate=115200;
     std::string model;
     std::string frame_id;
+    std::string calibration_filename;
     bool angle_fixed, intensities,low_exposure,reversion, resolution_fixed,heartbeat;
     bool auto_reconnect, debug;
     double angle_max,angle_min;
@@ -52,7 +53,7 @@ int main(int argc, char * argv[]) {
     ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
     ros::NodeHandle nh_private("~");
     nh_private.param<std::string>("port", port, "/dev/ydlidar"); 
-    nh_private.param<int>("baudrate", baudrate, 115200); 
+    nh_private.param<int>("baudrate", baudrate, 230400); 
     nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
     nh_private.param<bool>("angle_fixed", angle_fixed, "true");
     nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
@@ -60,11 +61,11 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("intensity", intensities, "false");
     nh_private.param<bool>("low_exposure", low_exposure, "false");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
-    nh_private.param<bool>("debug", debug, "false");
+    nh_private.param<std::string>("calibration_filename", calibration_filename, "LidarAngleCalibration.ini");
     nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
-    nh_private.param<int>("samp_rate", samp_rate, 4); 
+    nh_private.param<int>("samp_rate", samp_rate,5); 
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", _frequency , 7.0);
@@ -94,6 +95,7 @@ int main(int argc, char * argv[]) {
         angle_min = temp;
     }
 
+    ROS_INFO("[YDLIDAR INFO] Now YDLIDAR ROS SDK VERSION:%s .......", ROSVerision);
     laser.setSerialPort(port);
     laser.setSerialBaudrate(baudrate);
     laser.setIntensities(intensities);
@@ -105,14 +107,12 @@ int main(int argc, char * argv[]) {
     laser.setReversion(reversion);
     laser.setFixedResolution(resolution_fixed);
     laser.setAutoReconnect(auto_reconnect);
-    laser.setEnableDebug(debug);
     laser.setExposure(low_exposure);
     laser.setScanFrequency(_frequency);
     laser.setSampleRate(samp_rate);
-    laser.setReversion(reversion);
     laser.setIgnoreArray(ignore_array);
+    laser.setCalibrationFileName(calibration_filename);//Zero angle offset filename
     laser.initialize();
-
     ros::Rate rate(30);
 
     while (ros::ok()) {

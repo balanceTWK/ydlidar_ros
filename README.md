@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.3.3
+YDLIDAR ROS PACKAGE V1.3.7
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -34,12 +34,12 @@ You should see YDLIDAR's scan result in the console
 
 
 Parameters
-=====================================================================
+------------------------------------------------------------
 port (string, default: /dev/ydlidar)
 
     serial port name used in your system.
 
-baudrate (int, default: 115200)
+baudrate (int, default: 230400)
 
     serial port baud rate.
 
@@ -59,13 +59,9 @@ reversion (bool, default: false)
 
     indicated whether the LIDAR IS reversion.
 
-debug (bool, default: false)
+calibration_filename (string, default: LidarAngleCalibration.ini)
 
-        indicated whether the LIDAR IS enable debug.
-
-wait_delay (int, default: 0)
-
-        indicated whether the LIDAR IS reconnected once after [wait_delay]S.
+        Lidar zero angle calibration file.
 
 resolution_fixed (bool, default: true)
 
@@ -91,7 +87,7 @@ ignore_array (string, default: "")
 
     Set the current angle range value to zero.
 
-samp_rate (int, default: 4)
+samp_rate (int, default: 5)
 
     the LIDAR sampling frequency.
 
@@ -103,7 +99,12 @@ frequency (double, default: 7)
 
 
 Upgrade Log
-=====================================================================
+------------------------------------------------------------
+2018-10-29 version:1.3.7
+
+   1.Update SDK verison to 1.3.6
+
+   2.add calibration zero angle.
 
 2018-06-19 version:1.3.3
 
@@ -132,3 +133,9 @@ Upgrade Log
    8.Compensate for each laser point timestamp.
 
    9.Unified profile, automatic correction lidar model.
+   
+      
+   Contact EAI
+---------------
+
+If you have any extra questions, please feel free to [contact us](http://www.ydlidar.cn/cn/contact)
