@@ -58,6 +58,14 @@ angle_fixed (bool, default: true)
 reversion (bool, default: false)
 
     indicated whether the LIDAR IS reversion.
+    
+ sun_noise (bool, default: true)
+
+    indicated whether to turn off solar noise
+    
+glass_noise (bool, default: true)
+
+    indicated whether to turn off glass noise.
 
 calibration_filename (string, default: LidarAngleCalibration.ini)
 
