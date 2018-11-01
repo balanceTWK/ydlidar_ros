@@ -4,71 +4,59 @@
 #include <string>
 #include <signal.h>
 #include <memory>
-//#include <unistd.h>
+#include <string.h>
 using namespace std;
 using namespace ydlidar;
-CYdLidar laser;
-static bool running = false;
 
-static void Stop(int signo)   
-{  
-    
-    printf("Received exit signal\n");
-    running = true;
-     
-}  
+#if defined(_MSC_VER)
+#pragma comment(lib, "ydlidar_driver.lib")
+#endif
 
 int main(int argc, char * argv[])
 {
-
 	printf(" YDLIDAR C++ TEST\n");
     std::string port;
     std::string baudrate;
-    printf("Please enter the lidar port:");
-    std::cin>>port;
-    printf("Please enter the lidar baud rate:");
-    std::cin>>baudrate;
-    const int baud = atoi(baudrate.c_str());
-    const int intensities = 0;
+    int baud = 115200;
 
-    signal(SIGINT, Stop);
-    signal(SIGTERM, Stop);
+    std::map<std::string, std::string> lidars = YDlidarDriver::lidarPortList();
+    if(lidars.size()==1) {
+        std::map<string, string>::iterator iter = lidars.begin();
+        port = iter->second;
+    }else {
+        printf("Please enter the lidar serial port:");
+        std::cin>>port;
+        printf("Please enter the lidar serial baud rate:");
+        std::cin>>baudrate;
+        baud = atoi(baudrate.c_str());
+
+    }
+
+
+
+
+    ydlidar::init(argc, argv);
+    CYdLidar laser;
     laser.setSerialPort(port);
     laser.setSerialBaudrate(baud);
-    laser.setIntensities(intensities);
-    laser.setMaxRange(16.0);
-    laser.setMinRange(0.26);
-    laser.setMaxAngle(180);
-    laser.setMinAngle(-180);
-    laser.setHeartBeat(false);
-    laser.setReversion(false);
     laser.setFixedResolution(false);
+    laser.setReversion(false);
     laser.setAutoReconnect(true);
-
     laser.initialize();
-
-
-    while(!running){
+    while(ydlidar::ok()){
 		bool hardError;
 		LaserScan scan;
-
 		if(laser.doProcessSimple(scan, hardError )){
-            for(int i =0; i < scan.ranges.size(); i++ ){
-                float angle = scan.config.min_angle + i*scan.config.ang_increment;
-                float dis = scan.ranges[i];
-
-            }
-			fprintf(stderr,"Scan received: %u ranges\n",(unsigned int)scan.ranges.size());
-
+            fprintf(stdout,"Scan received: %u ranges\n",(unsigned int)scan.ranges.size());
+            fflush(stdout);
 		}
-    //usleep(50*1000);
-
-		
 	}
-  laser.turnOff();
-  laser.disconnecting();
 
-  return 0;
+
+    laser.turnOff();
+    laser.disconnecting();
+
+    return 0;
 
 
 }

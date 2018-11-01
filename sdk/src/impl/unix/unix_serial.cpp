@@ -39,6 +39,7 @@
 #include "unix_serial.h"
 #include <lock.h>
 
+
 #ifndef TIOCINQ
 #ifdef FIONREAD
 #define TIOCINQ FIONREAD
@@ -544,6 +545,7 @@ struct serial_struct {
 			case EMFILE:
 			default:
 			    UNLOCK(port_.c_str(), pid);
+				pid = -1;
 				return false;
 			}
 		}
@@ -568,7 +570,6 @@ struct serial_struct {
 			UNLOCK(port_.c_str(), pid);
 			return false;
 		}
-		flush();
 
 		// Update byte_time_ based on the new settings.
 		uint32_t bit_time_ns = 1e9 / baudrate_;
@@ -592,6 +593,7 @@ struct serial_struct {
 			}
 			UNLOCK(port_.c_str(), pid);
 			fd_ = -1;
+			pid = -1;
 			is_open_ = false;
 		}
 	}

@@ -72,11 +72,11 @@ namespace serial {
 		return pimpl_->open ();
 	}
 
-	void Serial::close () {
+    void Serial::closePort () {
 		pimpl_->close ();
 	}
 
-	bool Serial::isOpen () const {
+    bool Serial::isOpen () {
 		return pimpl_->isOpen ();
 	}
 
@@ -96,6 +96,7 @@ namespace serial {
 	int Serial::waitfordata(size_t data_count, uint32_t timeout, size_t * returned_size) {
 		return pimpl_->waitfordata(data_count, timeout, returned_size);
 	}
+
 
 	size_t Serial::read_ (uint8_t *buffer, size_t size) {
 		return this->pimpl_->read (buffer, size);
@@ -213,7 +214,7 @@ namespace serial {
 		ScopedReadLock rlock(this->pimpl_);
 		ScopedWriteLock wlock(this->pimpl_);
 		bool was_open = pimpl_->isOpen ();
-		if (was_open) close();
+        if (was_open) closePort();
 		pimpl_->setPort (port);
 		if (was_open) open ();
 	}
@@ -322,7 +323,7 @@ namespace serial {
 		return pimpl_->getCD ();
 	}
 
-	uint32_t Serial::getByteTime(){
+    int Serial::getByteTime(){
 		return pimpl_->getByteTime();
 	}
 }
