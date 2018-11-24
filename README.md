@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.3.7
+YDLIDAR ROS PACKAGE V1.3.8
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -108,6 +108,12 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
+2018-11-24 version:1.3.8
+
+   1.Reduce abnormal situation recovery time.
+   
+   2.fix timestamp from zero.
+
 2018-10-29 version:1.3.7
 
    1.Update SDK verison to 1.3.6
