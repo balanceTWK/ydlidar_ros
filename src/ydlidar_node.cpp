@@ -46,7 +46,7 @@ int main(int argc, char * argv[]) {
     int baudrate=115200;
     std::string model;
     std::string frame_id;
-    bool intensities,low_exposure,reversion, resolution_fixed;
+    bool reversion, resolution_fixed;
     bool auto_reconnect;
     double angle_max,angle_min;
     result_t op_result;
@@ -63,8 +63,6 @@ int main(int argc, char * argv[]) {
     nh_private.param<int>("baudrate", baudrate, 115200); 
     nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
     nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
-    nh_private.param<bool>("intensity", intensities, "false");
-    nh_private.param<bool>("low_exposure", low_exposure, "false");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
     nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
@@ -101,7 +99,6 @@ int main(int argc, char * argv[]) {
 
     laser.setSerialPort(port);
     laser.setSerialBaudrate(baudrate);
-    laser.setIntensities(intensities);
     laser.setMaxRange(max_range);
     laser.setMinRange(min_range);
     laser.setMaxAngle(angle_max);
@@ -109,14 +106,13 @@ int main(int argc, char * argv[]) {
     laser.setReversion(reversion);
     laser.setFixedResolution(resolution_fixed);
     laser.setAutoReconnect(auto_reconnect);
-    laser.setExposure(low_exposure);
     laser.setScanFrequency(_frequency);
     laser.setSampleRate(samp_rate);
     laser.setReversion(reversion);
     laser.setIgnoreArray(ignore_array);
     laser.initialize();
 
-    ros::Rate rate(30);
+    ros::Rate rate(20);
 
     while (ros::ok()) {
         bool hardError;
