@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.3.8
+YDLIDAR ROS PACKAGE V1.3.9
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -108,6 +108,12 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
+2018-12-07 version:1.3.9
+
+   1.Remove other lidar model interfaces functions.
+
+   2.Remove heartbeat
+
 2018-11-24 version:1.3.8
 
    1.Reduce abnormal situation recovery time.
