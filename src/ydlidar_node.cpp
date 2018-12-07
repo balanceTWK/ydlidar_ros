@@ -88,12 +88,12 @@ int main(int argc, char *argv[]) {
 
   CYdLidar laser;
 
-  if (_frequency < 5) {
-    _frequency = 7.0;
+  if (frequency < 5) {
+    frequency = 7.0;
   }
 
-  if (_frequency > 12) {
-    _frequency = 12;
+  if (frequency > 12) {
+    frequency = 12;
   }
 
   if (angle_max < angle_min) {
