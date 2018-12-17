@@ -3,18 +3,13 @@
 #include <iostream>
 #include <string>
 #include <memory>
+
 using namespace std;
 using namespace ydlidar;
+CYdLidar laser;
 
-#if defined(_MSC_VER)
-#pragma comment(lib, "ydlidar_driver.lib")
-#endif
 
 int main(int argc, char *argv[]) {
-
-  std::string port;
-  std::string baudrate;
-  int baud = 115200;
   printf("__   ______  _     ___ ____    _    ____  \n");
   printf("\\ \\ / /  _ \\| |   |_ _|  _ \\  / \\  |  _ \\ \n");
   printf(" \\ V /| | | | |    | || | | |/ _ \\ | |_) | \n");
@@ -23,46 +18,107 @@ int main(int argc, char *argv[]) {
   printf("\n");
   fflush(stdout);
 
-  std::map<std::string, std::string> lidars = YDlidarDriver::lidarPortList();
 
-  if (lidars.size() == 1) {
-    std::map<string, string>::iterator iter = lidars.begin();
-    port = iter->second;
+  std::string port;
+  int baudrate;
+  ydlidar::init(argc, argv);
+
+  std::map<std::string, std::string> ports =  ydlidar::YDlidarDriver::lidarPortList();
+  std::map<std::string, std::string>::iterator it;
+
+  if (ports.size() == 1) {
+    it = ports.begin();
+    ydlidar::console.show("Lidar[%s] detected, whether to select current radar(yes/no)?:",
+                          it->first.c_str());
+    std::string ok;
+    std::cin >> ok;
+
+    for (size_t i = 0; i < ok.size(); i++) {
+      ok[i] = tolower(ok[i]);
+    }
+
+    if (ok.find("yes") != std::string::npos || atoi(ok.c_str()) == 1) {
+      port = it->second;
+    } else {
+      ydlidar::console.message("Please enter the lidar serial port:");
+      std::cin >> port;
+    }
   } else {
-    printf("Please enter the lidar serial port:");
-    std::cin >> port;
-    printf("Please enter the lidar serial baud rate:");
-    std::cin >> baudrate;
-    baud = atoi(baudrate.c_str());
+    int id = 0;
 
+    for (it = ports.begin(); it != ports.end(); it++) {
+      ydlidar::console.show("%d. %s\n", id, it->first.c_str());
+      id++;
+    }
+
+    if (ports.empty()) {
+      ydlidar::console.show("Not Lidar was detected. Please enter the lidar serial port:");
+      std::cin >> port;
+    } else {
+      while (ydlidar::ok()) {
+        ydlidar::console.show("Please select the lidar port:");
+        std::string number;
+        std::cin >> number;
+
+        if ((size_t)atoi(number.c_str()) >= ports.size()) {
+          continue;
+        }
+
+        it = ports.begin();
+        id = atoi(number.c_str());
+
+        while (id) {
+          id--;
+          it++;
+        }
+
+        port = it->second;
+        break;
+      }
+    }
   }
 
 
 
+  baudrate = 115200;
 
-  ydlidar::init(argc, argv);
-  CYdLidar laser;
+  if (!ydlidar::ok()) {
+    return 0;
+  }
+
   laser.setSerialPort(port);
-  laser.setSerialBaudrate(baud);
-  laser.setFixedResolution(false);
+  laser.setSerialBaudrate(baudrate);
+  laser.setAutoReconnect(true);//hot plug
+  laser.setMaxRange(64.0);
+  laser.setMinRange(0.01);
+  laser.setMaxAngle(180);
+  laser.setMinAngle(-180);
   laser.setReversion(false);
-  laser.setAutoReconnect(true);
+  laser.setFixedResolution(false);
   laser.initialize();
+
 
   while (ydlidar::ok()) {
     bool hardError;
     LaserScan scan;
 
     if (laser.doProcessSimple(scan, hardError)) {
-      fprintf(stdout, "Scan received: %u ranges\n", (unsigned int)scan.ranges.size());
-      fflush(stdout);
-    }
-  }
+      for (int i = 0; i < scan.ranges.size(); i++) {
+        float angle = scan.config.min_angle + i * scan.config.ang_increment;
+        float dis = scan.ranges[i];
 
+      }
+
+      ydlidar::console.message("Scan received[%llu]: %u ranges", scan.self_time_stamp,
+                               (unsigned int)scan.ranges.size());
+    } else {
+      ydlidar::console.warning("Failed to get Lidar Data");
+    }
+
+  }
 
   laser.turnOff();
   laser.disconnecting();
-
   return 0;
 
 

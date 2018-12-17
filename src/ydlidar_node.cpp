@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.6"
+#define ROSVerision "1.3.9"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   std::string port;
   int baudrate = 115200;
   std::string frame_id;
-  bool angle_fixed, reversion, resolution_fixed;
+  bool reversion, resolution_fixed;
   bool auto_reconnect;
   double angle_max, angle_min;
   result_t op_result;
@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
   nh_private.param<std::string>("port", port, "/dev/ydlidar");
   nh_private.param<int>("baudrate", baudrate, 115200);
   nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
-  nh_private.param<bool>("angle_fixed", angle_fixed, "true");
   nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
   nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
   nh_private.param<bool>("reversion", reversion, "false");

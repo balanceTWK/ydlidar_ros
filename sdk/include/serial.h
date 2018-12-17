@@ -106,7 +106,7 @@ struct Timeout {
 /*!
 * Class that provides a portable serial port interface.
 */
-class Serial  {
+class Serial {
  public:
   /*!
   * Creates a Serial object and opens the port if a port is specified,
@@ -150,7 +150,6 @@ class Serial  {
   /*! Destructor */
   virtual ~Serial();
 
-
   /*!
   * Opens the serial port as long as the port is set and the port isn't
   * already open.
@@ -167,10 +166,10 @@ class Serial  {
   *
   * \return Returns true if the port is open, false otherwise.
   */
-  bool isOpen();
+  bool isOpen() const;
 
   /*! Closes the serial port. */
-  void closePort();
+  void close();
 
   /*! Return the number of characters in the buffer. */
   size_t available();
@@ -188,15 +187,7 @@ class Serial  {
   void waitByteTimes(size_t count);
 
 
-  /**
-   * @brief waitfordata
-   * @param data_count
-   * @param timeout
-   * @param returned_size
-   * @return
-   */
   int waitfordata(size_t data_count, uint32_t timeout, size_t *returned_size);
-
 
   /*! Read a given amount of bytes from the serial port into a given buffer.
   *
@@ -553,8 +544,7 @@ class Serial  {
   bool getCD();
 
   /*! Returns the singal byte time. */
-  int getByteTime();
-
+  uint32_t getByteTime();
 
  private:
   // Disable copy constructors
@@ -577,8 +567,8 @@ class Serial  {
 
 
 /*!
- * Structure that describes a serial device.
- */
+* Structure that describes a serial device.
+*/
 struct PortInfo {
 
   /*! Address of the serial port (this can be passed to the constructor of Serial). */
@@ -604,7 +594,6 @@ struct PortInfo {
 */
 std::vector<PortInfo>
 list_ports();
-
 
 } // namespace serial
 

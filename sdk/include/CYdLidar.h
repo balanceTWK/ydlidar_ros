@@ -4,7 +4,11 @@
 #include "ydlidar_driver.h"
 #include <math.h>
 
-
+#if !defined(__cplusplus)
+#ifndef __cplusplus
+#error "The YDLIDAR SDK requires a C++ compiler to be built"
+#endif
+#endif
 #define PropertyBuilderByName(type, name, access_permission)\
     access_permission:\
         type m_##name;\
@@ -16,8 +20,8 @@
         return m_##name;\
 }\
 
-
 using namespace ydlidar;
+
 
 class YDLIDAR_API CYdLidar {
   PropertyBuilderByName(float, MaxRange, private) ///< 设置和获取激光最大测距范围
@@ -30,8 +34,7 @@ class YDLIDAR_API CYdLidar {
   PropertyBuilderByName(bool, FixedResolution,
                         private) ///< 设置和获取激光是否是固定角度分辨率
   PropertyBuilderByName(bool, Reversion, private) ///< 设置和获取是否旋转激光180度
-  PropertyBuilderByName(bool, AutoReconnect, private) ///< 设置异常是否开启重新连接
-
+  PropertyBuilderByName(bool, AutoReconnect, private) ///< 设置异常是否自动重新连接
 
   PropertyBuilderByName(int, SerialBaudrate, private) ///< 设置和获取激光通讯波特率
   PropertyBuilderByName(std::string, SerialPort, private) ///< 设置和获取激光端口号
@@ -51,18 +54,6 @@ class YDLIDAR_API CYdLidar {
   bool  turnOn();  //!< See base class docs
   //Turn off the motor enable and close the scan
   bool  turnOff(); //!< See base class docs
-
-  /** Returns true if the device is in good health, If it's not*/
-  bool getDeviceHealth() const;
-
-  /** Returns true if the device information is correct, If it's not*/
-  bool getDeviceInfo(int &type);
-
-  /** Retruns true if the heartbeat function is set to heart is successful, If it's not*/
-  bool checkHeartBeat() const;
-
-  /** Retruns true if the scan frequency is set to user's frequency is successful, If it's not*/
-  bool checkScanFrequency();
 
   //Turn off lidar connection
   void disconnecting(); //!< Closes the comms with the laser. Shouldn't have to be directly needed by the user
@@ -88,10 +79,8 @@ class YDLIDAR_API CYdLidar {
 
  private:
   bool isScanning;
-  bool isConnected;
   int node_counts ;
   double each_angle;
   YDlidarDriver *lidarPtr;
-
 };	// End of class
 
