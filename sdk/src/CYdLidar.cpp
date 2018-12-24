@@ -466,12 +466,12 @@ bool CYdLidar::getDeviceInfo(int &type) {
     break;
 
   case  YDlidarDriver::YDLIDAR_G25:
-    model = "G25";
+    model = "G6";
     ans = lidarPtr->getSamplingRate(_rate);
 
     if (IS_OK(ans)) {
       switch (m_SampleRate) {
-      case 8:
+      case 10:
         _samp_rate = YDlidarDriver::YDLIDAR_RATE_4K;
         break;
 
@@ -502,7 +502,7 @@ bool CYdLidar::getDeviceInfo(int &type) {
 
       switch (_rate.rate) {
       case YDlidarDriver::YDLIDAR_RATE_4K:
-        _samp_rate = 8;
+        _samp_rate = 10;
         node_counts = 1440;
         each_angle = 0.25;
         break;
