@@ -30,15 +30,11 @@ class YDLIDAR_API CYdLidar {
                         private) ///< 设置和获取激光最大角度, 最大值180度
   PropertyBuilderByName(float, MinAngle,
                         private) ///< 设置和获取激光最小角度, 最小值-180度
-  PropertyBuilderByName(int, ScanFrequency,
+  PropertyBuilderByName(float, ScanFrequency,
                         private) ///< 设置和获取激光扫描频率(范围5HZ~12HZ)
 
-  PropertyBuilderByName(bool, Intensities,
-                        private) ///< 设置和获取激光带信号质量(只有S4B雷达支持)
   PropertyBuilderByName(bool, FixedResolution,
                         private) ///< 设置和获取激光是否是固定角度分辨率
-  PropertyBuilderByName(bool, Exposure,
-                        private) ///< 设置和获取激光时候开启低光功率曝光模式 只有S4雷达支持
   PropertyBuilderByName(bool, Reversion, private) ///< 设置和获取是否旋转激光180度
   PropertyBuilderByName(bool, AutoReconnect, private) ///< 设置异常是否自动重新连接
 
@@ -67,7 +63,7 @@ class YDLIDAR_API CYdLidar {
   bool getDeviceHealth() const;
 
   /** Returns true if the device information is correct, If it's not*/
-  bool getDeviceInfo(int &type);
+  bool getDeviceInfo();
 
   /** Retruns true if the scan frequency is set to user's frequency is successful, If it's not*/
   bool checkScanFrequency();
@@ -97,9 +93,8 @@ class YDLIDAR_API CYdLidar {
  private:
   bool isScanning;
   int node_counts ;
-  double each_angle;
-  bool m_isMultipleRate;
-  double m_FrequencyOffset;
+  float each_angle;
+  float m_FrequencyOffset;
 
   YDlidarDriver *lidarPtr;
 };	// End of class

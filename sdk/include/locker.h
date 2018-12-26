@@ -79,7 +79,6 @@ class Locker {
       timespec wait_time;
       timeval now;
       gettimeofday(&now, NULL);
-
       wait_time.tv_sec = timeout / 1000 + now.tv_sec;
       wait_time.tv_nsec = (timeout % 1000) * 1000000 + now.tv_usec * 1000;
 
@@ -117,14 +116,11 @@ class Locker {
       }
 
       return LOCK_OK;
-
 #endif
-
     }
 
 #endif
 #endif
-
     return LOCK_FAILED;
   }
 
@@ -260,7 +256,6 @@ class Event {
         timespec wait_time;
         timeval now;
         gettimeofday(&now, NULL);
-
         wait_time.tv_sec = timeout / 1000 + now.tv_sec;
         wait_time.tv_nsec = (timeout % 1000) * 1000000ULL + now.tv_usec * 1000;
 
@@ -284,7 +279,6 @@ class Event {
           ans = EVENT_FAILED;
           goto _final;
         }
-
       }
     }
 
@@ -296,10 +290,8 @@ class Event {
 
 _final:
     pthread_mutex_unlock(&_cond_locker);
-
     return ans;
 #endif
-
   }
  protected:
 

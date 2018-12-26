@@ -39,7 +39,6 @@ class Thread {
                                 0, NULL));
 #else
     assert(sizeof(thread_._handle) >= sizeof(pthread_t));
-
     pthread_create((pthread_t *)&thread_._handle, NULL, (void *(*)(void *))proc, param);
 #endif
     return thread_;

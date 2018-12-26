@@ -39,18 +39,6 @@ port (string, default: /dev/ydlidar)
 
     serial port name used in your system.
 
-baudrate (int, default: 115200)
-
-    serial port baud rate.
-
-frame_id (string, default: laser_frame)
-
-    frame ID for the device.
-
-low_exposure (low_exposure, default: false)
-
-    indicated whether the LIDAR has low light power mode.
-
 reversion (bool, default: false)
 
     indicated whether the LIDAR IS reversion.
@@ -71,7 +59,7 @@ range_min (double, default: 0.08)
 
     Min valid range (m) for LIDAR data.
 
-range_max (double, default: 16.0)
+range_max (double, default: 64.0)
 
     Max valid range (m) for LIDAR data.
 
@@ -79,11 +67,11 @@ ignore_array (string, default: "")
 
     Set the current angle range value to zero.
 
-samp_rate (int, default: 4)
+samp_rate (int, default: 18)
 
     the LIDAR sampling frequency.
 
-frequency (double, default: 7)
+frequency (double, default: 8)
 
     the LIDAR scanning frequency.
 

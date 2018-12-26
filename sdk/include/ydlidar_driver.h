@@ -43,6 +43,8 @@ class YDlidarDriver {
   */
   static std::map<std::string, std::string> lidarPortList();
 
+
+
   /**
   * @brief 连接雷达 \n
   * 连接成功后，必须使用::disconnect函数关闭
@@ -89,42 +91,17 @@ class YDlidarDriver {
   bool isconnected() const;
 
   /**
-  * @brief 设置雷达是否带信号质量 \n
-  * 连接成功后，必须使用::disconnect函数关闭
-  * @param[in] isintensities    是否带信号质量:
-  *     true	带信号质量
-  *	  false 无信号质量
-  * @note只有S4B(波特率是153600)雷达支持带信号质量, 别的型号雷达暂不支持
-  */
-  void setIntensities(const bool &isintensities);
-
-  /**
-  * @brief 设置雷达异常自动重新连接 \n
-  * @param[in] enable    是否开启自动重连:
-  *     true	开启
-  *	  false 关闭
-  */
+   * @brief 设置雷达异常自动重新连接 \n
+   * @param[in] enable    是否开启自动重连:
+   *     true	开启
+   *	  false 关闭
+   */
   void setAutoReconnect(const bool &enable);
 
-  /**
-  * @brief 设置雷达采样倍频 \n
-  * @param[in] enable    是否开启采样倍频:
-  *     true	开启
-  *	  false 关闭
-  */
-  void setMultipleRate(const bool &enable);
 
   /**
-  * @brief 获取当前雷达掉电保护功能 \n
-  * @return 返回掉电保护是否开启
-  * @retval true     掉电保护开启
-  * @retval false    掉电保护关闭
-  */
-  bool getMultipleRate() const;
-
-  /**
-  * @brief 检测传输时间 \n
-  * */
+   * @brief 检测传输时间 \n
+   * */
   void checkTransTime();
 
   /**
@@ -373,62 +350,6 @@ class YDlidarDriver {
   */
   result_t disableConstFreq(function_state &state, uint32_t timeout = DEFAULT_TIMEOUT);
 
-  /**
-  * @brief 保存当前激光曝光值 \n
-  * @param[in] low_exposure    低光功能状态
-  * @param[in] timeout      超时时间
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作, 当前操作需在非低光功率模式下, \n
-  * 只有S4雷达支持此功能
-  */
-  result_t setSaveLowExposure(scan_exposure &low_exposure, uint32_t timeout = DEFAULT_TIMEOUT);
-
-  /**
-  * @brief 设置低光功率模式 \n
-  * @param[in] low_exposure    扫描频率
-  * @param[in] timeout      超时时间
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作, 当前操作是开关量,只有S4雷达支持此功能
-  */
-  result_t setLowExposure(scan_exposure &low_exposure, uint32_t timeout = DEFAULT_TIMEOUT);
-
-  /**
-  * @brief 增加激光曝光值 \n
-  * @param[in] exposure     曝光值
-  * @param[in] timeout      超时时间
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作,只有S4雷达支持此功能
-  */
-  result_t setLowExposureAdd(scan_exposure &exposure, uint32_t timeout = DEFAULT_TIMEOUT);
-
-  /**
-  * @brief 减小激光曝光值 \n
-  * @param[in] exposure     曝光值
-  * @param[in] timeout      超时时间
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作,只有S4雷达支持此功能
-  */
-  result_t setLowExposurerDis(scan_exposure &exposure, uint32_t timeout = DEFAULT_TIMEOUT);
-
-  /**
-  * @brief 设置扫描一圈固定激光点数 \n
-  * @param[in] points    	  固定点数状态
-  * @param[in] timeout      超时时间
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  * @note 停止扫描后再执行当前操作, 当前操作是开关量,只有S4雷达支持此功能
-  */
-  result_t setPointsForOneRingFlag(scan_points &points, uint32_t timeout = DEFAULT_TIMEOUT);
-
  protected:
 
   /**
@@ -439,11 +360,11 @@ class YDlidarDriver {
 
 
   /**
-  * @brief 异常自动重新连接雷达
-  * @return 返回连接结果
-  * @retval true     成功
-  * @retval false    失败
-  */
+   * @brief 异常自动重新连接雷达
+   * @return 返回连接结果
+   * @retval true     成功
+   * @retval false    失败
+   */
   bool autoReconnectLidar();
 
 
@@ -555,6 +476,11 @@ class YDlidarDriver {
   */
   void clearDTR();
 
+  /**
+   * @brief flushCache
+   */
+  void flushCache();
+
 
  public:
   std::atomic<bool>     isConnected;  ///< 串口连接状体
@@ -581,7 +507,7 @@ class YDlidarDriver {
     YDLIDAR_G10			= 10,/**< G10雷达型号代号. */
     YDLIDAR_S4B 		= 11,/**< S4B雷达型号代号. */
     YDLIDAR_S2 			= 12,/**< S2雷达型号代号. */
-    YDLIDAR_G25 		= 13,/**< G25雷达型号代号. */
+    YDLIDAR_G6 		= 13,/**< G25雷达型号代号. */
     YDLIDAR_Tail,/**< 雷达型号代号. */
 
   };
@@ -606,7 +532,7 @@ class YDlidarDriver {
     YDLIDAR_G10_BAUD	= 230400,/**< G10雷达型号波特率. */
     YDLIDAR_S4B_BAUD 	= 153600,/**< S4B雷达型号波特率. */
     YDLIDAR_S2_BAUD 	= 115200,/**< S2雷达型号波特率. */
-    YDLIDAR_G25_BAUD 	= 512000,/**< G25雷达型号波特率. */
+    YDLIDAR_G6_BAUD 	= 512000,/**< G25雷达型号波特率. */
 
   };
 
@@ -620,9 +546,7 @@ class YDlidarDriver {
  private:
   int PackageSampleBytes;             ///< 一个包包含的激光点数
   serial::Serial *_serial;			///< 串口
-  bool m_intensities;					///< 信号质量状体
   int m_sampling_rate;					///< 采样频率
-  int model;							///< 雷达型号
   uint32_t m_baudrate;					///< 波特率
   bool isSupportMotorCtrl;			///< 是否支持电机控制
   uint64_t m_ns;						///< 时间戳
@@ -630,7 +554,6 @@ class YDlidarDriver {
   uint32_t m_pointTime;				///< 激光点直接时间间隔
   uint32_t trans_delay;				///< 串口传输一个byte时间
 
-  node_package package;
   node_packages packages;
 
   uint16_t package_Sample_Index;
@@ -645,7 +568,6 @@ class YDlidarDriver {
   uint16_t LastSampleAngleCal;
   bool CheckSunResult;
   uint16_t Valu8Tou16;
-  bool isMultipleRate;
   uint8_t scan_frequence;
 
   std::string serial_port;///< 雷达端口

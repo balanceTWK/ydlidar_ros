@@ -175,7 +175,6 @@ signal_handler(int signal_value)
 {
   // TODO(wjwwood): remove? move to console logging at some point?
   printf("signal_handler(%d)\n", signal_value);
-
 #ifdef HAS_SIGACTION
 
   if (old_action.sa_flags & SA_SIGINFO) {
@@ -198,7 +197,6 @@ signal_handler(int signal_value)
   }
 
 #endif
-
   trigger_interrupt_guard_condition(signal_value);
 }
 
@@ -215,7 +213,6 @@ inline void init(int argc, char *argv[]) {
   action.sa_flags = SA_SIGINFO;
   ::old_action = set_sigaction(SIGINT, action);
   set_sigaction(SIGTERM, action);
-
 #else
   ::old_signal_handler = set_signal_handler(SIGINT, ::signal_handler);
   // Register an on_shutdown hook to restore the old signal handler.

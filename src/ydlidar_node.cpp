@@ -45,10 +45,9 @@ int main(int argc, char *argv[]) {
   ros::init(argc, argv, "ydlidar_node");
 
   std::string port;
-  int baudrate = 115200;
   std::string model;
   std::string frame_id;
-  bool intensities, low_exposure, reversion, resolution_fixed;
+  bool reversion, resolution_fixed;
   bool auto_reconnect;
   double angle_max, angle_min;
   result_t op_result;
@@ -62,19 +61,16 @@ int main(int argc, char *argv[]) {
   ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
   ros::NodeHandle nh_private("~");
   nh_private.param<std::string>("port", port, "/dev/ydlidar");
-  nh_private.param<int>("baudrate", baudrate, 115200);
   nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
   nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
-  nh_private.param<bool>("intensity", intensities, "false");
-  nh_private.param<bool>("low_exposure", low_exposure, "false");
   nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
   nh_private.param<bool>("reversion", reversion, "false");
   nh_private.param<double>("angle_max", angle_max, 180);
   nh_private.param<double>("angle_min", angle_min, -180);
-  nh_private.param<int>("samp_rate", samp_rate, 4);
-  nh_private.param<double>("range_max", max_range, 16.0);
+  nh_private.param<int>("samp_rate", samp_rate, 18);
+  nh_private.param<double>("range_max", max_range, 64.0);
   nh_private.param<double>("range_min", min_range, 0.08);
-  nh_private.param<double>("frequency", _frequency, 7.0);
+  nh_private.param<double>("frequency", _frequency, 8.0);
   nh_private.param<std::string>("ignore_array", list, "");
 
   ignore_array = split(list, ',');
@@ -92,7 +88,7 @@ int main(int argc, char *argv[]) {
   CYdLidar laser;
 
   if (_frequency < 5) {
-    _frequency = 7.0;
+    _frequency = 8.0;
   }
 
   if (_frequency > 12) {
@@ -106,8 +102,6 @@ int main(int argc, char *argv[]) {
   }
 
   laser.setSerialPort(port);
-  laser.setSerialBaudrate(baudrate);
-  laser.setIntensities(intensities);
   laser.setMaxRange(max_range);
   laser.setMinRange(min_range);
   laser.setMaxAngle(angle_max);
@@ -115,7 +109,6 @@ int main(int argc, char *argv[]) {
   laser.setReversion(reversion);
   laser.setFixedResolution(resolution_fixed);
   laser.setAutoReconnect(auto_reconnect);
-  laser.setExposure(low_exposure);
   laser.setScanFrequency(_frequency);
   laser.setSampleRate(samp_rate);
   laser.setReversion(reversion);
