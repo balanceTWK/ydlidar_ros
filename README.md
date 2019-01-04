@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.3.9
+YDLIDAR ROS PACKAGE V2.0.0
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -39,21 +39,9 @@ port (string, default: /dev/ydlidar)
 
     serial port name used in your system.
 
-baudrate (int, default: 230400)
-
-    serial port baud rate.
-
 frame_id (string, default: laser_frame)
 
     frame ID for the device.
-
-low_exposure (low_exposure, default: false)
-
-    indicated whether the LIDAR has low light power mode.
-
-angle_fixed (bool, default: true)
-
-    indicated whether the driver needs do angle compensation.
 
 reversion (bool, default: false)
 
@@ -95,10 +83,6 @@ ignore_array (string, default: "")
 
     Set the current angle range value to zero.
 
-samp_rate (int, default: 5)
-
-    the LIDAR sampling frequency.
-
 frequency (double, default: 7)
 
     the LIDAR scanning frequency.
@@ -108,11 +92,14 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
-2018-12-07 version:1.3.9
+
+2019-01-03 version:2.0.0
 
    1.Remove other lidar model interfaces functions.
 
-   2.Remove heartbeat
+   2.fix turnOn function.
+   
+   3.Lidar supports zero offset angle adjustment.
 
 2018-11-24 version:1.3.8
 
