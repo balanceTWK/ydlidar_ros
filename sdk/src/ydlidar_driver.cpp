@@ -107,6 +107,7 @@ result_t YDlidarDriver::connect(const char *port_path, uint32_t baudrate) {
     sendCommand(LIDAR_CMD_FORCE_STOP);
     sendCommand(LIDAR_CMD_STOP);
   }
+  delay(50);
 
   clearDTR();
 
@@ -1303,7 +1304,7 @@ result_t YDlidarDriver::stop() {
     sendCommand(LIDAR_CMD_FORCE_STOP);
     sendCommand(LIDAR_CMD_STOP);
   }
-
+  delay(40);
   stopMotor();
 
   return RESULT_OK;
