@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   std::string model;
   std::string frame_id;
   bool intensities, low_exposure, reversion, resolution_fixed;
-  bool auto_reconnect;
+  bool auto_reconnect, debug;
   double angle_max, angle_min;
   result_t op_result;
   int samp_rate;
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
   nh_private.param<bool>("low_exposure", low_exposure, "false");
   nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
   nh_private.param<bool>("reversion", reversion, "false");
+  nh_private.param<bool>("debug", debug, "true");
   nh_private.param<double>("angle_max", angle_max, 180);
   nh_private.param<double>("angle_min", angle_min, -180);
   nh_private.param<int>("samp_rate", samp_rate, 4);
@@ -120,6 +121,7 @@ int main(int argc, char *argv[]) {
   laser.setSampleRate(samp_rate);
   laser.setReversion(reversion);
   laser.setIgnoreArray(ignore_array);
+  laser.setEnableDebug(debug);
   laser.initialize();
 
   ros::Rate rate(30);

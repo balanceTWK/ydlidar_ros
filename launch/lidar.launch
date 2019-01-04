@@ -7,6 +7,7 @@
     <param name="resolution_fixed"    type="bool"   value="true"/>
     <param name="auto_reconnect"    type="bool"   value="true"/>
     <param name="reversion"    type="bool"   value="false"/>
+    <param name="debug"    type="bool"   value="true"/>
     <param name="angle_min"    type="double" value="-180" />
     <param name="angle_max"    type="double" value="180" />
     <param name="range_min"    type="double" value="0.1" />
