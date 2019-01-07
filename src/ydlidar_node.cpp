@@ -117,6 +117,14 @@ int main(int argc, char * argv[]) {
     laser.setIgnoreArray(ignore_array);
     laser.setCalibrationFileName(calibration_filename);//Zero angle offset filename
     bool ret = laser.initialize();
+    if (ret) {
+        ret = laser.turnOn();
+        if (!ret) {
+            ROS_ERROR("Failed to start scan mode!!!");
+        }
+    } else {
+        ROS_ERROR("Error initializing YDLIDAR Comms and Status!!!");
+    }
     ros::Rate rate(20);
 
     while (ret&&ros::ok()) {
