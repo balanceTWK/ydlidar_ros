@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.0
+YDLIDAR ROS PACKAGE V2.0.1
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -93,6 +93,10 @@ frequency (double, default: 7)
 Upgrade Log
 ------------------------------------------------------------
 
+2019-01-15 version:2.0.1
+
+   1.support G4 Lidar.
+   
 2019-01-03 version:2.0.0
 
    1.Remove other lidar model interfaces functions.
