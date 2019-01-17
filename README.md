@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.1
+YDLIDAR ROS PACKAGE V2.0.2
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -57,7 +57,7 @@ glass_noise (bool, default: true)
 
 calibration_filename (string, default: LidarAngleCalibration.ini)
 
-        Lidar zero angle calibration file.
+    Lidar zero angle calibration file.
 
 resolution_fixed (bool, default: true)
 
@@ -92,6 +92,10 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
+
+2019-01-17 version:2.0.2
+
+   1.check lidar abnormality when turn on lidar.
 
 2019-01-15 version:2.0.1
 
