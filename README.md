@@ -55,10 +55,6 @@ glass_noise (bool, default: true)
 
     indicated whether to turn off glass noise.
 
-calibration_filename (string, default: LidarAngleCalibration.ini)
-
-    Lidar zero angle calibration file.
-
 resolution_fixed (bool, default: true)
 
     indicated whether the LIDAR has a fixed angular resolution.
@@ -83,9 +79,6 @@ ignore_array (string, default: "")
 
     Set the current angle range value to zero.
 
-frequency (double, default: 7)
-
-    the LIDAR scanning frequency.
 
 
 
