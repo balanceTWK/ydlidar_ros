@@ -8,8 +8,8 @@
     <param name="sun_noise"    type="bool"   value="true"/>
     <param name="glass_noise"    type="bool"   value="true"/>
     <param name="calibration_filename"        type="string"   value="LidarAngleCalibration.ini"/>
-    <param name="angle_min"    type="double" value="-180" />
-    <param name="angle_max"    type="double" value="180" />
+    <param name="angle_min"    type="double" value="0" />
+    <param name="angle_max"    type="double" value="360" />
     <param name="range_min"    type="double" value="0.1" />
     <param name="range_max"    type="double" value="16.0" />
     <param name="ignore_array" type="string" value="" />

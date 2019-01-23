@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "2.0.2"
+#define ROSVerision "2.0.3"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -68,8 +68,8 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("glass_noise", glass_noise, "true");
     nh_private.param<std::string>("calibration_filename", calibration_filename, "LidarAngleCalibration.ini");
     nh_private.param<bool>("reversion", reversion, "false");
-    nh_private.param<double>("angle_max", angle_max , 180);
-    nh_private.param<double>("angle_min", angle_min , -180);
+    nh_private.param<double>("angle_max", angle_max , 360);
+    nh_private.param<double>("angle_min", angle_min , 0);
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", frequency , 7.0);
@@ -81,8 +81,8 @@ int main(int argc, char * argv[]) {
     }
 
     for(uint16_t i =0 ; i < ignore_array.size();i++){
-        if(ignore_array[i] < -180 && ignore_array[i] > 180){
-            ROS_ERROR_STREAM("ignore array should be between -180 and 180");
+        if(ignore_array[i] < 0 && ignore_array[i] > 360){
+            ROS_ERROR_STREAM("ignore array should be between 0 and 360");
         }
     }
 
@@ -137,13 +137,13 @@ int main(int argc, char * argv[]) {
             start_scan_time.nsec = scan.system_time_stamp%1000000000ul;
             scan_msg.header.stamp = start_scan_time;
             scan_msg.header.frame_id = frame_id;
-            scan_msg.angle_min = scan.config.min_angle;
-            scan_msg.angle_max = scan.config.max_angle;
-            scan_msg.angle_increment = scan.config.ang_increment;
+            scan_msg.angle_min =DEG2RAD(scan.config.min_angle);
+            scan_msg.angle_max = DEG2RAD(scan.config.max_angle);
+            scan_msg.angle_increment = DEG2RAD(scan.config.ang_increment);
             scan_msg.scan_time = scan.config.scan_time;
             scan_msg.time_increment = scan.config.time_increment;
-            scan_msg.range_min = scan.config.min_range;
-            scan_msg.range_max = scan.config.max_range;
+            scan_msg.range_min = (scan.config.min_range);
+            scan_msg.range_max = (scan.config.max_range);
             
             scan_msg.ranges = scan.ranges;
             scan_msg.intensities =  scan.intensities;

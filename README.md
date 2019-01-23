@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.2
+YDLIDAR ROS PACKAGE V2.0.3
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -63,11 +63,11 @@ resolution_fixed (bool, default: true)
 
     indicated whether the LIDAR has a fixed angular resolution.
 
-angle_min (double, default: -180)
+angle_min (double, default: 0)
 
     Min valid angle (°) for LIDAR data.
 
-angle_max (double, default: 180)
+angle_max (double, default: 360)
 
     Max valid angle (°) for LIDAR data.
 
@@ -92,6 +92,10 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
+
+2019-01-23 version:2.0.3
+
+   1.Change the Lidar coordinate system to clockwise, ranging from 0 to 360 degrees.
 
 2019-01-17 version:2.0.2
 
