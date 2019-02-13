@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.3
+YDLIDAR ROS PACKAGE V2.0.4
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -92,6 +92,10 @@ frequency (double, default: 7)
 
 Upgrade Log
 ------------------------------------------------------------
+
+2019-02-13 version:2.0.4
+
+   1.fix ascendScanData timestamp issues.
 
 2019-01-23 version:2.0.3
 

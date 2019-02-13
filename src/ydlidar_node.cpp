@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "2.0.3"
+#define ROSVerision "2.0.4"
 
 
 std::vector<float> split(const std::string &s, char delim) {
