@@ -28,25 +28,25 @@ class Console {
  public:
   void
   show(const char *message_, ...) {
-    char out[1024] = { 0 };
+    char mout[1024] = { 0 };
     va_list args;
     va_start(args, message_);
-    vsnprintf(out, sizeof(out), message_, args);
+    vsnprintf(mout, sizeof(mout), message_, args);
     va_end(args);
     printf(COLOR_GREEN);
-    printf(out);
+    printf("%s", mout);
     printf(COLOR_NONE);
   }
   void
   message(const char *message_, ...) {
-    char out[1024] = { 0 };
+    char mout[1024] = { 0 };
     va_list args;
     va_start(args, message_);
-    vsnprintf(out, sizeof(out), message_, args);
+    vsnprintf(mout, sizeof(mout), message_, args);
     va_end(args);
     printf(COLOR_GREEN);
     printf("[YDLidar]: ");
-    printf(out);
+    printf("%s", mout);
     printf(COLOR_NONE);
     printf("\r\n");
   }
@@ -54,14 +54,14 @@ class Console {
 
   void
   warning(const char *warning_, ...) {
-    char out[1024] = { 0 };
+    char mout[1024] = { 0 };
     va_list args;
     va_start(args, warning_);
-    vsnprintf(out, sizeof(out), warning_, args);
+    vsnprintf(mout, sizeof(mout), warning_, args);
     va_end(args);
     printf(COLOR_YELLOW);
     printf("Warning: ");
-    printf(out);
+    printf("%s", mout);
     printf(COLOR_NONE);
     printf("\r\n");
   }
@@ -69,14 +69,14 @@ class Console {
 
   void
   error(const char *error_, ...) {
-    char out[1024] = { 0 };
+    char mout[1024] = { 0 };
     va_list args;
     va_start(args, error_);
-    vsnprintf(out, sizeof(out), error_, args);
+    vsnprintf(mout, sizeof(mout), error_, args);
     va_end(args);
     printf(COLOR_RED);
     printf("Error: ");
-    printf(out);
+    printf("%s", mout);
     printf(COLOR_NONE);
     printf("\r\n");
   }
@@ -84,16 +84,16 @@ class Console {
 
   void
   debug(const char *message_, ...) {
-    char out[1024] = { 0 };
+    char mout[1024] = { 0 };
     va_list args;
 
     if (access(DEBUG_FLAG_FILE, 0) == 0) {
       va_start(args, message_);
-      vsnprintf(out, sizeof(out), message_, args);
+      vsnprintf(mout, sizeof(mout), message_, args);
       va_end(args);
       printf(COLOR_CYAN);
       printf(">>>   ");
-      printf(out);
+      printf("%s", mout);
       printf(COLOR_NONE);
       printf("\r\n");
     }
