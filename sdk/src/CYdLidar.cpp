@@ -76,7 +76,7 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError) {
     op_result = lidarPtr->ascendScanData(nodes, count);
     //同步后的时间
     tim_scan_start = nodes[0].stamp;
-    tim_scan_end   = nodes[0].stamp;
+    tim_scan_end   = nodes[count - 1].stamp;
 
     if (IS_OK(op_result)) {
       if (!m_FixedResolution) {
@@ -177,7 +177,7 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError) {
           }
 
           for (uint16_t j = 0; j < m_IgnoreArray.size(); j = j + 2) {
-            if ((m_IgnoreArray[j] < angle) && (angle <= m_IgnoreArray[j + 1])) {
+            if ((m_IgnoreArray[j] <= angle) && (angle <= m_IgnoreArray[j + 1])) {
               range = 0.0;
               break;
             }
@@ -200,17 +200,20 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError) {
       scan_msg.self_time_stamp = tim_scan_start;
       scan_msg.config.min_angle = DEG2RAD(m_MinAngle);
       scan_msg.config.max_angle = DEG2RAD(m_MaxAngle);
-      if (scan_msg.config.max_angle - scan_msg.config.min_angle == 2*M_PI) {
+
+      if ((scan_msg.config.max_angle - scan_msg.config.min_angle) == 2 * M_PI) {
         scan_msg.config.ang_increment = (scan_msg.config.max_angle - scan_msg.config.min_angle) /
-                                      (double)counts;
+                                        (double)counts;
         scan_msg.config.time_increment = scan_time / (double)counts;
+        scan_msg.config.time_increment /= 1e9;
       } else {
         scan_msg.config.ang_increment = (scan_msg.config.max_angle - scan_msg.config.min_angle) /
-                                      (double)(counts - 1);
+                                        (double)(counts - 1);
         scan_msg.config.time_increment = scan_time / (double)(counts - 1);
+        scan_msg.config.time_increment /= 1e9;
       }
-      scan_msg.config.time_increment /= 1e9;
-      scan_msg.config.scan_time = scan_time/1e9;
+
+      scan_msg.config.scan_time = scan_time / 1e9;
       scan_msg.config.min_range = m_MinRange;
       scan_msg.config.max_range = m_MaxRange;
       outscan = scan_msg;
@@ -466,12 +469,12 @@ bool CYdLidar::getDeviceInfo(int &type) {
     break;
 
   case  YDlidarDriver::YDLIDAR_G25:
-    model = "G6";
+    model = "G25";
     ans = lidarPtr->getSamplingRate(_rate);
 
     if (IS_OK(ans)) {
       switch (m_SampleRate) {
-      case 10:
+      case 8:
         _samp_rate = YDlidarDriver::YDLIDAR_RATE_4K;
         break;
 
@@ -502,7 +505,7 @@ bool CYdLidar::getDeviceInfo(int &type) {
 
       switch (_rate.rate) {
       case YDlidarDriver::YDLIDAR_RATE_4K:
-        _samp_rate = 10;
+        _samp_rate = 8;
         node_counts = 1440;
         each_angle = 0.25;
         break;

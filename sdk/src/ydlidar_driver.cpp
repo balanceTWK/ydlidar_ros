@@ -107,7 +107,7 @@ result_t YDlidarDriver::connect(const char *port_path, uint32_t baudrate) {
     sendCommand(LIDAR_CMD_FORCE_STOP);
     sendCommand(LIDAR_CMD_STOP);
   }
-  delay(40);
+
   clearDTR();
 
   return RESULT_OK;
@@ -432,6 +432,7 @@ int YDlidarDriver::cacheScanData() {
 
             if (IS_OK(ans)) {
               timeout_count = 0;
+              local_scan[0].sync_flag = Node_NotSync;
               isAutoconnting = false;
               continue;
             }
@@ -440,6 +441,7 @@ int YDlidarDriver::cacheScanData() {
 
       } else {
         timeout_count++;
+        local_scan[0].sync_flag = Node_NotSync;
       }
     } else {
       timeout_count = 0;
@@ -948,10 +950,12 @@ result_t YDlidarDriver::ascendScanData(node_info *nodebuffer, size_t count) {
 
   for (i = (int)zero_pos; i < (int)count; i++) {
     tmpbuffer[i - zero_pos] = nodebuffer[i];
+    tmpbuffer[i - zero_pos].stamp = nodebuffer[i - zero_pos].stamp;
   }
 
   for (i = 0; i < (int)zero_pos; i++) {
     tmpbuffer[i + (int)count - zero_pos] = nodebuffer[i];
+    tmpbuffer[i + (int)count - zero_pos].stamp = nodebuffer[i + (int)count - zero_pos].stamp;
   }
 
   memcpy(nodebuffer, tmpbuffer, count * sizeof(node_info));
@@ -1303,7 +1307,7 @@ result_t YDlidarDriver::stop() {
     sendCommand(LIDAR_CMD_FORCE_STOP);
     sendCommand(LIDAR_CMD_STOP);
   }
-  delay(40);
+
   stopMotor();
 
   return RESULT_OK;
