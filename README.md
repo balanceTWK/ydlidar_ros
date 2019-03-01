@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.4
+YDLIDAR ROS PACKAGE V2.0.5
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -87,11 +87,19 @@ frequency (double, default: 7)
 
     the LIDAR scanning frequency.
 
+max_abnormal_check_count (int, default: 2)
+
+    the LIDAR scanning the maximum number of abnormal checks.
+
 
 
 
 Upgrade Log
 ------------------------------------------------------------
+
+2019-03-01 version:2.0.5
+
+   1.fix Large motor resistance at startup issues.
 
 2019-02-13 version:2.0.4
 

@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "2.0.4"
+#define ROSVerision "2.0.5"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -56,6 +56,7 @@ int main(int argc, char * argv[]) {
     double max_range, min_range;
     double frequency;
     bool sun_noise, glass_noise;
+    int max_abnormal_check_count;
 
     ros::NodeHandle nh;
     ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
@@ -73,6 +74,7 @@ int main(int argc, char * argv[]) {
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", frequency , 7.0);
+    nh_private.param<int>("max_abnormal_check_count", max_abnormal_check_count , 2);
     nh_private.param<std::string>("ignore_array",list,"");
 
     ignore_array = split(list ,',');
@@ -98,6 +100,9 @@ int main(int argc, char * argv[]) {
         angle_max = angle_min;
         angle_min = temp;
     }
+    if (max_abnormal_check_count < 2) {
+        max_abnormal_check_count = 2;
+    }
 
     ROS_INFO("[YDLIDAR INFO] Now YDLIDAR ROS SDK VERSION:%s .......", ROSVerision);
     laser.setSerialPort(port);
@@ -114,6 +119,7 @@ int main(int argc, char * argv[]) {
     laser.setGlassNoise(glass_noise);
     laser.setScanFrequency(frequency);
     laser.setSampleRate(samp_rate);
+    laser.setAbnormalCheckCount(max_abnormal_check_count);
     laser.setIgnoreArray(ignore_array);
     laser.setCalibrationFileName(calibration_filename);//Zero angle offset filename
     bool ret = laser.initialize();
