@@ -1,134 +1,96 @@
-YDLIDAR ROS PACKAGE V1.3.3
+YDLIDAR ROS驱动包(V1.4.0)
 =====================================================================
 
-ROS node and test application for YDLIDAR
 
-Visit EAI Website for more details about YDLIDAR.
 
-How to build YDLIDAR ros package
+怎么构建ROS驱动包
 =====================================================================
     1) Clone this project to your catkin's workspace src folder
+    	(1). git clone https://github.com/YDLIDAR/ydlidar
+    	(2). git chectout gaussian
     2) Running catkin_make to build ydlidar_node and ydlidar_client
     3) Create the name "/dev/ydlidar" for YDLIDAR
     --$ roscd ydlidar/startup
     --$ sudo chmod 777 ./*
     --$ sudo sh initenv.sh
 
-How to run YDLIDAR ros package
+怎样运行YDLIDAR ROS 包
 =====================================================================
-There're two ways to run YDLIDAR ros package
+有两种方式运行方式
 
-1. Run YDLIDAR node and view in the rviz
+1. 运行YDLIDAR 节点并在RVIZ上显示
 ------------------------------------------------------------
-roslaunch ydlidar lidar_view.launch
+	roslaunch ydlidar lidar_view.launch
 
-You should see YDLIDAR's scan result in the rviz.
-
-2. Run YDLIDAR node and view using test application
+2.运行YDLIDAR 节点在终端上显示
 ------------------------------------------------------------
-roslaunch ydlidar lidar.launch
+	roslaunch ydlidar lidar.launch
 
-rosrun ydlidar ydlidar_client
-
-You should see YDLIDAR's scan result in the console
+	rosrun ydlidar ydlidar_client
 
 
-Parameters
+
+配置参数
 =====================================================================
 port (string, default: /dev/ydlidar)
 
-    serial port name used in your system.
-
-baudrate (int, default: 115200)
-
-    serial port baud rate.
+    当前雷达端口号
 
 frame_id (string, default: laser_frame)
 
-    frame ID for the device.
-
-low_exposure (low_exposure, default: false)
-
-    indicated whether the LIDAR has low light power mode.
-
-angle_fixed (bool, default: true)
-
-    indicated whether the driver needs do angle compensation.
+    雷达坐标系名称
 
 reversion (bool, default: false)
 
-    indicated whether the LIDAR IS reversion.
-
-debug (bool, default: false)
-
-        indicated whether the LIDAR IS enable debug.
-
-wait_delay (int, default: 0)
-
-        indicated whether the LIDAR IS reconnected once after [wait_delay]S.
+    是否旋转雷达数据180度
 
 resolution_fixed (bool, default: true)
 
-    indicated whether the LIDAR has a fixed angular resolution.
+    是否固定角度分辨率输出
+auto_reconnect(bool, default: true)
+
+     是否雷达支持热插拔
 
 angle_min (double, default: -180)
 
-    Min valid angle (°) for LIDAR data.
+    雷达最小有效角度
 
 angle_max (double, default: 180)
 
-    Max valid angle (°) for LIDAR data.
+    雷达最大有效角度
 
 range_min (double, default: 0.08)
 
-    Min valid range (m) for LIDAR data.
+    雷达最小有效距离
 
 range_max (double, default: 16.0)
 
-    Max valid range (m) for LIDAR data.
+    雷达最大有效距离
 
 ignore_array (string, default: "")
 
-    Set the current angle range value to zero.
+    剔除角度列表
 
-samp_rate (int, default: 4)
+samp_rate (int, default: 9)
 
-    the LIDAR sampling frequency.
+    雷达采样频率
 
-frequency (double, default: 7)
+frequency (double, default: 10)
 
-    the LIDAR scanning frequency.
-
-
+    雷达扫描频率
 
 
-Upgrade Log
+
+
+更新日志
 =====================================================================
 
-2018-06-19 version:1.3.3
+2019-03-25 version:1.4.0
 
-   1.Update SDK verison to 1.3.5
-
-   2.add debug MODEL
-
-   3.add reversion scan data
-
-2018-04-16 version:1.3.1
-
-   1.Update SDK verison to 1.3.1
-
-   2.Increase sampling frequency,scan frequency setting.
-
-   3.Unified coordinate system.
-
-   4.Repair X4,S4 LIDAR cannot be opened.
-
-   5.Increased G4 G4C F4Pro LIDAR power-off protection.
-
-   6.Increased S4B LIDAR low optical power setting.
-
-   7.Fix the wait time for closing ros node.
-
-   8.Compensate for each laser point timestamp.
-
-   9.Unified profile, automatic correction lidar model.
+   1.修复时间戳错误
+   
+   2.雷达启动异常检测
+   
+   3.移除别的雷达型号支持, 仅仅支持G4雷达
+   
+   4.优化turnOn 和 turnOff 

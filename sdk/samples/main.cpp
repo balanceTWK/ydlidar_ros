@@ -1,74 +1,166 @@
-
+﻿
 #include "CYdLidar.h"
 #include <iostream>
 #include <string>
-#include <signal.h>
-#include <memory>
-//#include <unistd.h>
 using namespace std;
 using namespace ydlidar;
-CYdLidar laser;
-static bool running = false;
 
-static void Stop(int signo)   
-{  
-    
-    printf("Received exit signal\n");
-    running = true;
-     
-}  
+#if defined(_MSC_VER)
+#pragma comment(lib, "ydlidar_driver.lib")
+#endif
 
-int main(int argc, char * argv[])
+int main(int argc, char *argv[])
 {
-
-	printf(" YDLIDAR C++ TEST\n");
+    printf("__   ______  _     ___ ____    _    ____  \n");
+    printf("\\ \\ / /  _ \\| |   |_ _|  _ \\  / \\  |  _ \\ \n");
+    printf(" \\ V /| | | | |    | || | | |/ _ \\ | |_) | \n");
+    printf("  | | | |_| | |___ | || |_| / ___ \\|  _ <  \n");
+    printf("  |_| |____/|_____|___|____/_/   \\_\\_| \\_\\ \n");
+    printf("\n");
+    fflush(stdout);
     std::string port;
-    std::string baudrate;
-    printf("Please enter the lidar port:");
-    std::cin>>port;
-    printf("Please enter the lidar baud rate:");
-    std::cin>>baudrate;
-    const int baud = atoi(baudrate.c_str());
-    const int intensities = 0;
+    ydlidar::init(argc, argv);
 
-    signal(SIGINT, Stop);
-    signal(SIGTERM, Stop);
+    std::map<std::string, std::string> ports =  ydlidar::YDlidarDriver::lidarPortList();
+    std::map<std::string, std::string>::iterator it;
+
+    if (ports.size() == 1)
+    {
+        port = ports.begin()->second;
+        /*it = ports.begin();
+        printf("Lidar[%s] detected, whether to select current radar(yes/no)?:",
+               it->first.c_str());
+        std::string ok;
+        std::cin >> ok;
+
+        for (size_t i = 0; i < ok.size(); i++)
+        {
+            ok[i] = tolower(ok[i]);
+        }
+
+        if (ok.find("yes") != std::string::npos || atoi(ok.c_str()) == 1)
+        {
+            port = it->second;
+        }
+        else
+        {
+            printf("Please enter the lidar serial port:");
+            std::cin >> port;
+        }*/
+    }
+    else
+    {
+        int id = 0;
+
+        for (it = ports.begin(); it != ports.end(); it++)
+        {
+            printf("%d. %s\n", id, it->first.c_str());
+            id++;
+        }
+
+        if (ports.empty())
+        {
+            printf("Not Lidar was detected. Please enter the lidar serial port:");
+            std::cin >> port;
+        }
+        else
+        {
+            while (ydlidar::ok())
+            {
+                printf("Please select the lidar port:");
+                std::string number;
+                std::cin >> number;
+
+                if ((size_t)atoi(number.c_str()) >= ports.size())
+                {
+                    continue;
+                }
+
+                it = ports.begin();
+                id = atoi(number.c_str());
+
+                while (id)
+                {
+                    id--;
+                    it++;
+                }
+
+                port = it->second;
+                break;
+            }
+        }
+    }
+
+    std::string input_frequency;
+    float frequency = 8.0;
+    while (ydlidar::ok())
+    {
+        printf("Please enter the lidar scan frequency[5-12]:");
+        std::cin >> input_frequency;
+        frequency = atof(input_frequency.c_str());
+        if(frequency <= 12.0 && frequency >= 5.0 )
+        {
+            break;
+        }
+        fprintf(stderr, "Invalid scan frequency,The scanning frequency range is 5 to 12 HZ, Please re-enter.\n");
+    }
+
+    if(!ydlidar::ok())
+    {
+        return 0;
+    }
+    CYdLidar laser;
     laser.setSerialPort(port);
-    laser.setSerialBaudrate(baud);
-    laser.setIntensities(intensities);
-    laser.setMaxRange(16.0);
-    laser.setMinRange(0.26);
+    laser.setSerialBaudrate(230400);
+    laser.setFixedResolution(false);
+    laser.setReversion(false); //
+    laser.setAutoReconnect(true);//hot plug
+
+    //unit: °
     laser.setMaxAngle(180);
     laser.setMinAngle(-180);
-    laser.setHeartBeat(false);
-    laser.setReversion(false);
-    laser.setFixedResolution(false);
-    laser.setAutoReconnect(true);
 
-    laser.initialize();
+    //unit: m
+    laser.setMinRange(0.1);
+    laser.setMaxRange(16.0);
 
+    //unit: K
+    laser.setSampleRate(9);
 
-    while(!running){
-		bool hardError;
-		LaserScan scan;
-
-		if(laser.doProcessSimple(scan, hardError )){
-            for(int i =0; i < scan.ranges.size(); i++ ){
-                float angle = scan.config.min_angle + i*scan.config.ang_increment;
-                float dis = scan.ranges[i];
-
-            }
-			fprintf(stderr,"Scan received: %u ranges\n",(unsigned int)scan.ranges.size());
-
-		}
-    //usleep(50*1000);
-
-		
-	}
-  laser.turnOff();
-  laser.disconnecting();
-
-  return 0;
+    //unit: Hz
+    laser.setScanFrequency(frequency);
 
 
+    std::vector<float> ignore_array;
+    ignore_array.clear();
+    laser.setIgnoreArray(ignore_array);
+
+    bool ret = laser.initialize();
+    if(ret)
+    {
+        ret = laser.turnOn();
+    }
+
+    while (ret && ydlidar::ok())
+    {
+        bool hardError;
+        LaserScan scan;
+
+        if (laser.doProcessSimple(scan, hardError))
+        {
+            fprintf(stdout, "Scan received[%llu]: %u ranges is [%f]Hz\n", scan.self_time_stamp,
+                    (unsigned int)scan.ranges.size(), 1.0 / scan.config.scan_time);
+            fflush(stdout);
+        }
+        else
+        {
+            fprintf(stderr, "Failed to get Lidar Data\n");
+            fflush(stderr);
+        }
+    }
+
+    laser.turnOff();
+    laser.disconnecting();
+
+    return 0;
 }
