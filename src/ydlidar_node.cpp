@@ -128,9 +128,9 @@ int main(int argc, char * argv[]) {
             start_scan_time.nsec = scan.system_time_stamp%1000000000ul;
             scan_msg.header.stamp = start_scan_time;
             scan_msg.header.frame_id = frame_id;
-            scan_msg.angle_min =DEG2RAD(scan.config.min_angle);
-            scan_msg.angle_max = DEG2RAD(scan.config.max_angle);
-            scan_msg.angle_increment = DEG2RAD(scan.config.ang_increment);
+            scan_msg.angle_min =(scan.config.min_angle);
+            scan_msg.angle_max = (scan.config.max_angle);
+            scan_msg.angle_increment = (scan.config.ang_increment);
             scan_msg.scan_time = scan.config.scan_time;
             scan_msg.time_increment = scan.config.time_increment;
             scan_msg.range_min = (scan.config.min_range);
