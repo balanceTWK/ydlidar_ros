@@ -7,7 +7,7 @@ YDLIDAR ROS驱动包(V1.4.0)
 =====================================================================
     1) Clone this project to your catkin's workspace src folder
     	(1). git clone https://github.com/YDLIDAR/ydlidar
-    	(2). git chectout gaussian
+    	(2). git chectout S4
     2) Running catkin_make to build ydlidar_node and ydlidar_client
     3) Create the name "/dev/ydlidar" for YDLIDAR
     --$ roscd ydlidar/startup
@@ -63,7 +63,7 @@ range_min (double, default: 0.08)
 
     雷达最小有效距离
 
-range_max (double, default: 16.0)
+range_max (double, default: 12.0)
 
     雷达最大有效距离
 
@@ -71,13 +71,10 @@ ignore_array (string, default: "")
 
     剔除角度列表
 
-samp_rate (int, default: 9)
+count_fixed (int, default: -1)
 
-    雷达采样频率
+    自定义输出点数
 
-frequency (double, default: 10)
-
-    雷达扫描频率
 
 
 
@@ -91,6 +88,6 @@ frequency (double, default: 10)
    
    2.雷达启动异常检测
    
-   3.移除别的雷达型号支持, 仅仅支持G4雷达
+   3.移除别的雷达型号支持, 仅仅支持S4雷达
    
    4.优化turnOn 和 turnOff 

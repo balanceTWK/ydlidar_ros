@@ -42,8 +42,8 @@ int main(int argc, char * argv[]) {
     fflush(stdout);
   
     std::string port;
-    int baudrate=230400;
-    int samp_rate = 9;
+    int baudrate=115200;
+    int count_fixed = -1;
     std::string frame_id;
     bool reversion, resolution_fixed;
     bool auto_reconnect;
@@ -61,13 +61,11 @@ int main(int argc, char * argv[]) {
     nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
     nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
-    nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
-    nh_private.param<double>("range_max", max_range , 16.0);
+    nh_private.param<double>("range_max", max_range , 12.0);
     nh_private.param<double>("range_min", min_range , 0.08);
-    nh_private.param<double>("frequency", frequency , 10.0);
-    nh_private.param<int>("samp_rate", samp_rate , 9);
+    nh_private.param<int>("count_fixed", count_fixed , -1);
     nh_private.param<std::string>("ignore_array",list,"");
 
     ignore_array = split(list ,',');
@@ -82,12 +80,6 @@ int main(int argc, char * argv[]) {
     }
 
     CYdLidar laser;
-    if(frequency<5){
-       frequency = 7.0; 
-    }
-    if(frequency>12){
-        frequency = 12;
-    }
     if(angle_max < angle_min){
         double temp = angle_max;
         angle_max = angle_min;
@@ -101,11 +93,9 @@ int main(int argc, char * argv[]) {
     laser.setMinRange(min_range);
     laser.setMaxAngle(angle_max);
     laser.setMinAngle(angle_min);
-    laser.setReversion(reversion);
     laser.setFixedResolution(resolution_fixed);
     laser.setAutoReconnect(auto_reconnect);
-    laser.setScanFrequency(frequency);
-    laser.setSampleRate(samp_rate);
+    laser.setFixedCount(count_fixed);
     laser.setIgnoreArray(ignore_array);
     bool ret = laser.initialize();
     if (ret) {
