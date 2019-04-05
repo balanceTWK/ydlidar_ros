@@ -88,6 +88,6 @@ count_fixed (int, default: -1)
    
    2.雷达启动异常检测
    
-   3.移除别的雷达型号支持, 仅仅支持S4雷达
+   3.移除别的雷达型号支持, 仅仅支持S4B雷达
    
    4.优化turnOn 和 turnOff 
