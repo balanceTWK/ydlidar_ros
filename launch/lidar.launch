@@ -1,9 +1,7 @@
 <launch>
   <node name="ydlidar_node"  pkg="ydlidar"  type="ydlidar_node" output="screen" respawn="false" >
     <param name="port"         type="string" value="/dev/ydlidar"/>  
-    <param name="baudrate"     type="int"    value="115200"/>
     <param name="frame_id"     type="string" value="laser_frame"/>
-    <param name="angle_fixed"  type="bool"   value="true"/>
     <param name="resolution_fixed"    type="bool"   value="true"/>
     <param name="auto_reconnect"    type="bool"   value="true"/>
     <param name="reversion"    type="bool"   value="false"/>

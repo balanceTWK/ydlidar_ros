@@ -20,8 +20,10 @@
 using namespace ydlidar;
 
 class YDLIDAR_API CYdLidar {
-  PropertyBuilderByName(float, MaxRange, private) ///< 设置和获取激光最大测距范围
-  PropertyBuilderByName(float, MinRange, private) ///< 设置和获取激光最小测距范围
+  PropertyBuilderByName(float, MaxRange,
+                        private) ///< 设置和获取激光最大测距范围
+  PropertyBuilderByName(float, MinRange,
+                        private) ///< 设置和获取激光最小测距范围
   PropertyBuilderByName(float, MaxAngle,
                         private) ///< 设置和获取激光最大角度, 最大值180度
   PropertyBuilderByName(float, MinAngle,
@@ -29,13 +31,20 @@ class YDLIDAR_API CYdLidar {
 
   PropertyBuilderByName(bool, FixedResolution,
                         private) ///< 设置和获取激光是否是固定角度分辨率
-  PropertyBuilderByName(bool, Reversion, private) ///< 设置和获取是否旋转激光180度
-  PropertyBuilderByName(bool, AutoReconnect, private) ///< 设置异常是否开启重新连接
+  PropertyBuilderByName(bool, Reversion,
+                        private) ///< 设置和获取是否旋转激光180度
+  PropertyBuilderByName(bool, AutoReconnect,
+                        private) ///< 设置异常是否开启重新连接
 
 
-  PropertyBuilderByName(int, SerialBaudrate, private) ///< 设置和获取激光通讯波特率
-  PropertyBuilderByName(std::string, SerialPort, private) ///< 设置和获取激光端口号
-  PropertyBuilderByName(std::vector<float>, IgnoreArray, private) ///< 设置和获取激光剔除点
+  PropertyBuilderByName(int, SerialBaudrate,
+                        private) ///< 设置和获取激光通讯波特率
+  PropertyBuilderByName(std::string, SerialPort,
+                        private) ///< 设置和获取激光端口号
+  PropertyBuilderByName(std::vector<float>, IgnoreArray,
+                        private) ///< 设置和获取激光剔除点
+  PropertyBuilderByName(int, AbnormalCheckCount,
+                        private) ///< Maximum number of abnormal checks
 
 
  public:
@@ -84,6 +93,9 @@ class YDLIDAR_API CYdLidar {
     */
   bool checkHardware();
 
+  /** returns true if the lidar data is normal, If it's not*/
+  bool checkLidarAbnormal();
+
 
 
  private:
@@ -91,6 +103,7 @@ class YDLIDAR_API CYdLidar {
   bool isConnected;
   int node_counts ;
   double each_angle;
+  double m_scan_default_frequency;
   YDlidarDriver *lidarPtr;
 
 };	// End of class
