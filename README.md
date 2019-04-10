@@ -71,10 +71,6 @@ ignore_array (string, default: "")
 
     剔除角度列表
 
-samp_rate (int, default: 9)
-
-    雷达采样频率
-
 frequency (double, default: 10)
 
     雷达扫描频率
@@ -91,6 +87,6 @@ frequency (double, default: 10)
    
    2.雷达启动异常检测
    
-   3.移除别的雷达型号支持, 仅仅支持G4雷达
+   3.移除别的雷达型号支持, 仅仅支持G4B雷达
    
    4.优化turnOn 和 turnOff 

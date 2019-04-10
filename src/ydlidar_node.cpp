@@ -42,8 +42,6 @@ int main(int argc, char * argv[]) {
     fflush(stdout);
   
     std::string port;
-    int baudrate=230400;
-    int samp_rate = 9;
     std::string frame_id;
     bool reversion, resolution_fixed;
     bool auto_reconnect;
@@ -67,7 +65,6 @@ int main(int argc, char * argv[]) {
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", frequency , 10.0);
-    nh_private.param<int>("samp_rate", samp_rate , 9);
     nh_private.param<std::string>("ignore_array",list,"");
 
     ignore_array = split(list ,',');
@@ -96,7 +93,6 @@ int main(int argc, char * argv[]) {
 
     ROS_INFO("[YDLIDAR INFO] Now YDLIDAR ROS SDK VERSION:%s .......", ROSVerision);
     laser.setSerialPort(port);
-    laser.setSerialBaudrate(baudrate);
     laser.setMaxRange(max_range);
     laser.setMinRange(min_range);
     laser.setMaxAngle(angle_max);
@@ -105,7 +101,6 @@ int main(int argc, char * argv[]) {
     laser.setFixedResolution(resolution_fixed);
     laser.setAutoReconnect(auto_reconnect);
     laser.setScanFrequency(frequency);
-    laser.setSampleRate(samp_rate);
     laser.setIgnoreArray(ignore_array);
     bool ret = laser.initialize();
     if (ret) {
