@@ -150,7 +150,6 @@ class Serial  {
   /*! Destructor */
   virtual ~Serial();
 
-
   /*!
   * Opens the serial port as long as the port is set and the port isn't
   * already open.
@@ -197,6 +196,23 @@ class Serial  {
    */
   int waitfordata(size_t data_count, uint32_t timeout, size_t *returned_size);
 
+
+  /**
+   * @brief writeData
+   * @param data
+   * @param size
+   * @return
+   */
+  virtual size_t writeData(const uint8_t *data, size_t size);
+
+
+  /**
+   * @brief readData
+   * @param data
+   * @param size
+   * @return
+   */
+  virtual size_t readData(uint8_t *data, size_t size);
 
   /*! Read a given amount of bytes from the serial port into a given buffer.
   *
@@ -577,8 +593,8 @@ class Serial  {
 
 
 /*!
- * Structure that describes a serial device.
- */
+* Structure that describes a serial device.
+*/
 struct PortInfo {
 
   /*! Address of the serial port (this can be passed to the constructor of Serial). */
@@ -604,7 +620,6 @@ struct PortInfo {
 */
 std::vector<PortInfo>
 list_ports();
-
 
 } // namespace serial
 

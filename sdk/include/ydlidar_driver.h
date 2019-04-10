@@ -1,6 +1,7 @@
 #ifndef YDLIDAR_DRIVER_H
 #define YDLIDAR_DRIVER_H
 #include <stdlib.h>
+#include <atomic>
 #include <map>
 #include "serial.h"
 #include "locker.h"
@@ -12,6 +13,7 @@
 #error "The YDLIDAR SDK requires a C++ compiler to be built"
 #endif
 #endif
+
 
 using namespace std;
 using namespace serial;
@@ -36,11 +38,8 @@ class YDlidarDriver {
   * @brief 连接雷达 \n
   * 连接成功后，必须使用::disconnect函数关闭
   * @param[in] port_path    串口号
-  * @param[in] fileMode    波特率，YDLIDAR雷达有以下几个波特率：
-  *     115200 F4, G4C, S4A
-  *     128000 X4
-  *     153600 S4B
-  *     230600 F4PRO, G4
+  * @param[in] baudrate    波特率，YDLIDAR-SS雷达波特率：
+  *     230400 G2-SS-1
   * @return 返回连接状态
   * @retval 0     成功
   * @retval < 0   失败
@@ -62,11 +61,19 @@ class YDlidarDriver {
   static std::string getSDKVersion();
 
   /**
-  * @brief 获取雷达列表
-  * 静态函数
-  * @return map:第一个参数是雷达别名, 第二个参数是当前串口号
+  * @brief lidarPortList 获取雷达端口
+  * @return 在线雷达列表
   */
   static std::map<std::string, std::string> lidarPortList();
+
+
+  /**
+  * @brief 扫图状态 \n
+  * @return 返回当前雷达扫图状态
+  * @retval true     正在扫图
+  * @retval false    扫图关闭
+  */
+  bool isscanning() const;
 
   /**
   * @brief 连接雷达状态 \n
@@ -77,13 +84,22 @@ class YDlidarDriver {
   bool isconnected() const;
 
   /**
+  * @brief 设置雷达是否带信号质量 \n
+  * 连接成功后，必须使用::disconnect函数关闭
+  * @param[in] isintensities    是否带信号质量:
+  *     true	带信号质量
+  *	  false 无信号质量
+  * @note只有S4B(波特率是153600)雷达支持带信号质量, 别的型号雷达暂不支持
+  */
+  void setIntensities(const bool &isintensities);
+
+  /**
   * @brief 设置雷达异常自动重新连接 \n
   * @param[in] enable    是否开启自动重连:
   *     true	开启
   *	  false 关闭
   */
   void setAutoReconnect(const bool &enable);
-
 
   /**
   * @brief 开启扫描 \n
@@ -115,7 +131,8 @@ class YDlidarDriver {
   * @retval RESULT_FAILE    获取失败
   * @note 获取之前，必须使用::startScan函数开启扫描
   */
-  result_t grabScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT) ;
+  result_t grabScanData(node_info *nodebuffer, size_t &count,
+                        uint32_t timeout = DEFAULT_TIMEOUT) ;
 
 
   /**
@@ -131,20 +148,14 @@ class YDlidarDriver {
   result_t ascendScanData(node_info *nodebuffer, size_t count);
 
   /**
-  * @brief 打开电机 \n
+  * @brief 重置激光雷达 \n
+  * @param[in] timeout      超时时间
   * @return 返回执行结果
   * @retval RESULT_OK       成功
   * @retval RESULT_FAILE    失败
+  * @note 停止扫描后再执行当前操作, 如果在扫描中调用::stop函数停止扫描
   */
-  result_t startMotor();
-
-  /**
-  * @brief 关闭电机 \n
-  * @return 返回执行结果
-  * @retval RESULT_OK       成功
-  * @retval RESULT_FAILE    失败
-  */
-  result_t stopMotor();
+  result_t reset(uint32_t timeout = DEFAULT_TIMEOUT);
 
  protected:
 
@@ -166,6 +177,12 @@ class YDlidarDriver {
   */
   result_t startAutoScan(bool force = false, uint32_t timeout = DEFAULT_TIMEOUT) ;
 
+  /**
+  * @brief stopScan
+  * @param timeout
+  * @return
+  */
+  result_t stopScan(uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 解包激光数据 \n
@@ -184,7 +201,8 @@ class YDlidarDriver {
   * @retval RESULT_TIMEOUT  等待超时
   * @retval RESULT_FAILE    失败
   */
-  result_t waitScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitScanData(node_info *nodebuffer, size_t &count,
+                        uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 激光数据解析线程 \n
@@ -200,7 +218,8 @@ class YDlidarDriver {
   * @retval RESULT_OK       成功
   * @retval RESULT_FAILE    失败
   */
-  result_t sendCommand(uint8_t cmd, const void *payload = NULL, size_t payloadsize = 0);
+  result_t sendCommand(uint8_t cmd, const void *payload = NULL,
+                       size_t payloadsize = 0);
 
   /**
   * @brief 等待激光数据包头 \n
@@ -212,7 +231,8 @@ class YDlidarDriver {
   * @retval RESULT_FAILE    获取失败
   * @note 当timeout = -1 时, 将一直等待
   */
-  result_t waitResponseHeader(lidar_ans_header *header, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitResponseHeader(lidar_ans_header *header,
+                              uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 等待固定数量串口数据 \n
@@ -248,6 +268,12 @@ class YDlidarDriver {
   */
   result_t sendData(const uint8_t *data, size_t size);
 
+
+  /**
+  * @brief checkTransDelay
+  */
+  void checkTransDelay();
+
   /**
   * @brief 关闭数据获取通道 \n
   */
@@ -263,31 +289,55 @@ class YDlidarDriver {
   */
   void clearDTR();
 
+  /**
+   * @brief flushSerial
+   */
+  void flushSerial();
+
+  /**
+   * @brief checkAutoConnecting
+   */
+  result_t checkAutoConnecting();
+
 
  public:
-  bool     isConnected;  ///< 串口连接状体
-  bool     isScanning;   ///< 扫图状态
-  bool     isAutoReconnect;  ///< 异常自动从新连接
-  bool     isAutoconnting;  ///< 是否正在自动连接中
+  std::atomic<bool>     isConnected;  ///< 串口连接状体
+  std::atomic<bool>     isScanning;   ///< 扫图状态
+  std::atomic<bool>     isAutoReconnect;  ///< 异常自动从新连接
+  std::atomic<bool>     isAutoconnting;  ///< 是否正在自动连接中
 
 
   enum {
     DEFAULT_TIMEOUT = 2000,    /**< 默认超时时间. */
     DEFAULT_HEART_BEAT = 1000, /**< 默认检测掉电功能时间. */
     MAX_SCAN_NODES = 2048,	   /**< 最大扫描点数. */
-    DEFAULT_TIMEOUT_COUNT = 10,
+    DEFAULT_TIMEOUT_COUNT = 1,
   };
   enum {
-    YDLIDAR_F4 = 1, /**< F4雷达型号代号. */
-    YDLIDAR_T1 = 2, /**< T1雷达型号代号. */
-    YDLIDAR_F2 = 3, /**< F2雷达型号代号. */
-    YDLIDAR_S4 = 4, /**< S4雷达型号代号. */
-    YDLIDAR_G4 = 5, /**< G4雷达型号代号. */
-    YDLIDAR_X4 = 6, /**< X4雷达型号代号. */
-    YDLIDAR_F4PRO = 6, /**< F4PRO雷达型号代号. */
-    YDLIDAR_G4C = 9, /**< G4C雷达型号代号. */
-
+    YDLIDAR_F4 = 1,
+    YDLIDAR_T1 = 2,
+    YDLIDAR_F2 = 3,
+    YDLIDAR_S4 = 4,
+    YDLIDAR_G4 = 5,
+    YDLIDAR_X4 = 6,
+    YDLIDAR_G4PRO = 7,
+    YDLIDAR_F4PRO = 8,
+    YDLIDAR_G2_SS_1 = 9,//230400
+    YDLIDAR_G10 = 10, //256000
+    YDLIDAR_S4B = 11,//153600
+    YDLIDAR_S2 = 12,//115200
+    YDLIDAR_G25 = 13,//512000
+    YDLIDAR_Tail,
   };
+
+  enum {
+    YDLIDAR_RATE_4K = 0,
+    YDLIDAR_RATE_8K = 1,
+    YDLIDAR_RATE_9K = 2,
+    YDLIDAR_RATE_10K = 3,
+  };
+
+
   node_info      scan_node_buf[2048];  ///< 激光点信息
   size_t         scan_node_count;      ///< 激光点数
   Event          _dataEvent;			 ///< 数据同步事件
@@ -296,27 +346,32 @@ class YDlidarDriver {
   Thread 	       _thread;				///< 线程id
 
  private:
+  int PackageSampleBytes;             ///< 一个包包含的激光点数
   serial::Serial *_serial;			///< 串口
+  bool m_intensities;					///< 信号质量状体
+  uint32_t m_baudrate;				///< 波特率
+  bool isSupportMotorCtrl;			///< 是否支持电机控制
+  uint64_t m_node_time_ns;			///< 时间戳
+  uint64_t m_node_last_time_ns;       ///< 时间戳
+  uint32_t m_pointTime;				///< 激光点直接时间间隔
+  uint32_t trans_delay;				///< 串口传输一个byte时间
+
+  node_package package;
   node_packages packages;
 
-  float       IntervalSampleAngle;
-  float       IntervalSampleAngle_LastPackage;
-  int         PackageSampleBytes;             ///< 一个包包含的激光点数
-  bool        isSupportMotorCtrl;			///< 是否支持电机控制
-  bool        CheckSunResult;
-  uint32_t    m_baudrate;					///< 波特率
-  uint64_t    m_ns;						///< 时间戳
-  uint64_t    m_last_ns;						///< 时间戳
-  uint32_t    m_signalpointTime;			///< 两个激光点时间间隔
-  uint32_t    trans_delay;				///< 串口传输一个byte时间
-  uint16_t    package_Sample_Index;
-  uint16_t    FirstSampleAngle;
-  uint16_t    LastSampleAngle;
-  uint16_t    CheckSun;
-  uint16_t    CheckSunCal;
-  uint16_t    SampleNumlAndCTCal;
-  uint16_t    LastSampleAngleCal;
-  uint16_t    Valu8Tou16;
+  uint16_t package_Sample_Index;
+  float IntervalSampleAngle;
+  float IntervalSampleAngle_LastPackage;
+  uint16_t FirstSampleAngle;
+  uint16_t LastSampleAngle;
+  uint16_t CheckSun;
+  uint8_t scan_frequence;
+
+  uint16_t CheckSunCal;
+  uint16_t SampleNumlAndCTCal;
+  uint16_t LastSampleAngleCal;
+  bool CheckSunResult;
+  uint16_t Valu8Tou16;
 
   std::string serial_port;///< 雷达端口
 

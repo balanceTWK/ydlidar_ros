@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.6"
+#define ROSVerision "1.4.0"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -37,9 +37,8 @@ int main(int argc, char *argv[]) {
   ros::init(argc, argv, "ydlidar_node");
 
   std::string port;
-  int baudrate = 115200;
   std::string frame_id;
-  bool angle_fixed, reversion, resolution_fixed;
+  bool resolution_fixed;
   bool auto_reconnect;
   double angle_max, angle_min;
   result_t op_result;
@@ -51,12 +50,9 @@ int main(int argc, char *argv[]) {
   ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
   ros::NodeHandle nh_private("~");
   nh_private.param<std::string>("port", port, "/dev/ydlidar");
-  nh_private.param<int>("baudrate", baudrate, 115200);
   nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
-  nh_private.param<bool>("angle_fixed", angle_fixed, "true");
   nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
   nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
-  nh_private.param<bool>("reversion", reversion, "false");
   nh_private.param<double>("angle_max", angle_max, 180);
   nh_private.param<double>("angle_min", angle_min, -180);
   nh_private.param<double>("range_max", max_range, 16.0);
@@ -85,21 +81,20 @@ int main(int argc, char *argv[]) {
   }
 
   laser.setSerialPort(port);
-  laser.setSerialBaudrate(baudrate);
   laser.setMaxRange(max_range);
   laser.setMinRange(min_range);
   laser.setMaxAngle(angle_max);
   laser.setMinAngle(angle_min);
-  laser.setReversion(reversion);
   laser.setFixedResolution(resolution_fixed);
   laser.setAutoReconnect(auto_reconnect);
-  laser.setReversion(reversion);
   laser.setIgnoreArray(ignore_array);
-  laser.initialize();
-
+  bool ret = laser.initialize();
+  if (ret) {
+    ret = laser.turnOn();
+  }
   ros::Rate rate(30);
 
-  while (ros::ok()) {
+  while (ret && ros::ok()) {
     bool hardError;
     LaserScan scan;//原始激光数据
 

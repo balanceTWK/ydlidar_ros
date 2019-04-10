@@ -4,16 +4,26 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <string>
+#include <string.h>
 #include <signal.h>
 #include <cerrno>
 #include <stdexcept>
 #include <csignal>
-#include <sstream>
+#include <sys/stat.h>
+#if defined(_MSC_VER)
+#include <io.h>
+#endif
 
+#if !defined(_MSC_VER)
+#include <unistd.h>
+#endif
 
 #define UNUSED(x) (void)x
+
+#if !defined(_MSC_VER)
+#	define _access access
+#endif
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 typedef signed char int8_t;
@@ -60,7 +70,6 @@ typedef uint32_t       _size_t;
 typedef _size_t (THREAD_PROC *thread_proc_t)(void *);
 
 typedef int32_t result_t;
-typedef uint64_t TTimeStamp;
 
 #define RESULT_OK      0
 #define RESULT_TIMEOUT -1
@@ -68,26 +77,15 @@ typedef uint64_t TTimeStamp;
 
 #define INVALID_TIMESTAMP (0)
 
-#define IS_OK(x)    ( (x) == RESULT_OK )
-#define IS_TIMEOUT(x)  ( (x) == RESULT_TIMEOUT )
-#define IS_FAIL(x)  ( (x) == RESULT_FAIL )
-
-
 enum {
   DEVICE_DRIVER_TYPE_SERIALPORT = 0x0,
   DEVICE_DRIVER_TYPE_TCP = 0x1,
 };
 
 
-#if !defined(_countof)
-#define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
-#endif
-
-#ifndef M_PI
-#define M_PI 3.1415926
-#endif
-
-#define DEG2RAD(x) ((x)*M_PI/180.)
+#define IS_OK(x)    ( (x) == RESULT_OK )
+#define IS_TIMEOUT(x)  ( (x) == RESULT_TIMEOUT )
+#define IS_FAIL(x)  ( (x) == RESULT_FAIL )
 
 
 // Determine if sigaction is available
@@ -149,10 +147,8 @@ set_signal_handler(int signal_value, signal_handler_t signal_handler)
     strerror_s(error_string, error_length, errno);
 #endif
     // *INDENT-OFF* (prevent uncrustify from making unnecessary indents here)
-    std::ostringstream stm ;
-    stm << errno ;
     throw std::runtime_error(
-      std::string("Failed to set SIGINT signal handler: (" + stm.str() + ")") +
+      std::string("Failed to set SIGINT signal handler: (" + std::to_string(errno) + ")") +
       error_string);
     // *INDENT-ON*
   }
@@ -230,6 +226,23 @@ inline bool ok() {
 inline void shutdownNow() {
   trigger_interrupt_guard_condition(SIGINT);
 }
+
+//inline bool fileExists(const std::string filename) {
+//    return 0 == _access(filename.c_str(), 0x00 ); // 0x00 = Check for existence only!
+//}
+
+inline bool fileExists(const std::string filename) {
+#ifdef _WIN32
+  struct _stat info = {0};
+  int ret = _stat(filename.c_str(), &info);
+#else
+  struct stat info = {0};
+  int ret = stat(filename.c_str(), &info);
+#endif
+  return (ret == 0);
+  /*return 0 == _access(filename.c_str(), 0x00 ); // 0x00 = Check for existence only!*/
+}
+
 
 }
 
