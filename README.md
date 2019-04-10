@@ -40,7 +40,7 @@ frame_id (string, default: laser_frame)
 
     雷达坐标系名称
 
-reversion (bool, default: false)
+reversion (bool, default: true)
 
     是否旋转雷达数据180度
 

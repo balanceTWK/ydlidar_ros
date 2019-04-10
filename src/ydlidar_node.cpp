@@ -61,7 +61,7 @@ int main(int argc, char * argv[]) {
     nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
     nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
-    nh_private.param<bool>("reversion", reversion, "false");
+    nh_private.param<bool>("reversion", reversion, "true");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
     nh_private.param<double>("range_max", max_range , 16.0);
