@@ -40,10 +40,6 @@ frame_id (string, default: laser_frame)
 
     雷达坐标系名称
 
-reversion (bool, default: true)
-
-    是否旋转雷达数据180度
-
 resolution_fixed (bool, default: true)
 
     是否固定角度分辨率输出
@@ -71,14 +67,6 @@ ignore_array (string, default: "")
 
     剔除角度列表
 
-samp_rate (int, default: 9)
-
-    雷达采样频率
-
-frequency (double, default: 10)
-
-    雷达扫描频率
-
 
 
 
@@ -91,6 +79,6 @@ frequency (double, default: 10)
    
    2.雷达启动异常检测
    
-   3.移除别的雷达型号支持, 仅仅支持G4雷达
+   3.移除别的雷达型号支持, 仅仅支持X4雷达
    
    4.优化turnOn 和 turnOff 
