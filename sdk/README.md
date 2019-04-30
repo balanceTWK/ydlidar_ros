@@ -40,7 +40,7 @@ How to build YDLIDAR SDK samples
 ---------------
     $ git clone https://github.com/ydlidar/sdk
     $ cd sdk
-    $ git checkout S2I
+    $ git checkout SZY
     $ cd ..
     $ mkdir build
     $ cd build

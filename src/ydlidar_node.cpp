@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
   nh_private.param<double>("angle_max", angle_max, 180);
   nh_private.param<double>("angle_min", angle_min, -180);
-  nh_private.param<double>("range_max", max_range, 16.0);
+  nh_private.param<double>("range_max", max_range, 8.0);
   nh_private.param<double>("range_min", min_range, 0.08);
   nh_private.param<std::string>("ignore_array", list, "");
 
