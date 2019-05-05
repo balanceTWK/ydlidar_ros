@@ -145,7 +145,7 @@ int main(int argc, char * argv[]) {
     }
 
     laser.turnOff();
-    printf("[YDLIDAR INFO] Now YDLIDAR is stopping .......\n");
+    ROS_INFO("[YDLIDAR INFO] Now YDLIDAR is stopping .......");
     laser.disconnecting();
     return 0;
 }

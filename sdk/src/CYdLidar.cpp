@@ -2,6 +2,7 @@
 #include "common.h"
 #include <map>
 #include <angles.h>
+#include <ros/console.h>
 
 using namespace std;
 using namespace ydlidar;
@@ -273,7 +274,7 @@ bool  CYdLidar::turnOn()
         op_result = lidarPtr->startScan();
         if (!IS_OK(op_result))
         {
-            fprintf(stderr, "[CYdLidar] Failed to start scan mode: %x\n", op_result);
+            ROS_ERROR("[CYdLidar] Failed to start scan mode: %x", op_result);
             isScanning = false;
             return false;
         }
@@ -281,14 +282,13 @@ bool  CYdLidar::turnOn()
     if (checkLidarAbnormal())
     {
         lidarPtr->stop();
-        fprintf(stderr, "[CYdLidar] Failed to turn on the Lidar, because the lidar is blocked or the lidar hardware is faulty.\n");
+        ROS_ERROR"[CYdLidar] Failed to turn on the Lidar, because the lidar is blocked or the lidar hardware is faulty.");
         isScanning = false;
         return false;
     }
     isScanning = true;
     lidarPtr->setAutoReconnect(m_AutoReconnect);
-    printf("[YDLIDAR INFO] Now YDLIDAR is scanning ......\n");
-    fflush(stdout);
+    ROS_INFO("[YDLIDAR INFO] Now YDLIDAR is scanning ......");
     return true;
 }
 
@@ -303,7 +303,7 @@ bool  CYdLidar::turnOff()
     }
     if (isScanning)
     {
-        printf("[YDLIDAR INFO] Now YDLIDAR Scanning has stopped ......\n");
+        ROS_INFO("[YDLIDAR INFO] Now YDLIDAR Scanning has stopped ......");
     }
     isScanning = false;
     return true;
@@ -346,17 +346,17 @@ bool CYdLidar::getDeviceHealth()
     lidarPtr->stop();
     result_t op_result;
     device_health healthinfo;
-    printf("[YDLIDAR]:SDK Version: %s\n", YDlidarDriver::getSDKVersion().c_str());
+    ROS_INFO("[YDLIDAR]:SDK Version: %s", YDlidarDriver::getSDKVersion().c_str());
     op_result = lidarPtr->getHealth(healthinfo);
 
     if (IS_OK(op_result))
     {
-        printf("[YDLIDAR]:Lidar running correctly ! The health status: %s\n",
+        ROS_INFO"[YDLIDAR]:Lidar running correctly ! The health status: %s",
                (int)healthinfo.status == 0 ? "good" : "bad");
 
         if (healthinfo.status == 2)
         {
-            fprintf(stderr, "Error, Yd Lidar internal error detected. Please reboot the device to retry.\n");
+            ROS_ERROR("Error, Yd Lidar internal error detected. Please reboot the device to retry.");
             return false;
         }
         else
@@ -367,7 +367,7 @@ bool CYdLidar::getDeviceHealth()
     }
     else
     {
-        fprintf(stderr, "Error, cannot retrieve Yd Lidar health code: %x\n", op_result);
+        ROS_ERROR("Error, cannot retrieve Yd Lidar health code: %x", op_result);
         return false;
     }
 
@@ -383,12 +383,12 @@ bool CYdLidar::getDeviceInfo()
     result_t op_result = lidarPtr->getDeviceInfo(devinfo);
     if (!IS_OK(op_result))
     {
-        fprintf(stderr, "get Device Information Error\n");
+        ROS_ERROR("get Device Information Error");
         return false;
     }
     if ( devinfo.model != YDlidarDriver::YDLIDAR_G4)
     {
-        printf("[YDLIDAR INFO] Current SDK does not support current lidar models[%d]\n", devinfo.model);
+        ROS_INFO("[YDLIDAR INFO] Current SDK does not support current lidar models[%d]", devinfo.model);
         return false;
     }
     std::string model = "G4";
@@ -422,7 +422,7 @@ bool CYdLidar::getDeviceInfo()
 
     printf("\n");
     checkSampleRate();
-    printf("[YDLIDAR INFO] Current Sampling Rate : %dK\n", m_SampleRate);
+    ROS_INFO("[YDLIDAR INFO] Current Sampling Rate : %dK", m_SampleRate);
     checkScanFrequency();
     return true;
 }
@@ -539,7 +539,7 @@ bool CYdLidar::checkScanFrequency()
     }
     else
     {
-        fprintf(stderr, "current scan frequency[%f] is out of range.",
+        ROS_ERROR("current scan frequency[%f] is out of range.",
                 m_ScanFrequency - frequencyOffset);
     }
     ans = lidarPtr->getScanFrequency(_scan_frequency);
@@ -551,7 +551,7 @@ bool CYdLidar::checkScanFrequency()
     m_ScanFrequency -= frequencyOffset;
     node_counts = m_SampleRate * 1000 / (m_ScanFrequency - 0.1);
     each_angle = 360.0 / node_counts;
-    printf("[YDLIDAR INFO] Current Scan Frequency: %fHz\n", m_ScanFrequency);
+    ROS_INFO("[YDLIDAR INFO] Current Scan Frequency: %fHz", m_ScanFrequency);
     return true;
 }
 
@@ -568,7 +568,7 @@ bool  CYdLidar::checkCOMMs()
 
         if (!lidarPtr)
         {
-            fprintf(stderr, "Create Driver fail\n");
+            ROS_ERROR"Create Driver fail");
             return false;
         }
     }
@@ -597,7 +597,7 @@ bool  CYdLidar::checkCOMMs()
 
     if (!IS_OK(op_result))
     {
-        fprintf(stderr, "[CYdLidar] Error, cannot bind to the specified serial port[%s] and baudrate[%d]\n",
+        ROS_ERROR("[CYdLidar] Error, cannot bind to the specified serial port[%s] and baudrate[%d]",
                 m_SerialPort.c_str(), m_SerialBaudrate);
         return false;
     }
@@ -664,15 +664,13 @@ bool CYdLidar::initialize()
 {
     if (!checkCOMMs())
     {
-        fprintf(stderr, "[CYdLidar::initialize] Error initializing YDLIDAR check Comms.\n");
-        fflush(stderr);
+        ROS_ERROR("[CYdLidar::initialize] Error initializing YDLIDAR check Comms.");
         return false;
     }
 
     if(!checkStatus())
     {
-        fprintf(stderr, "[CYdLidar::initialize] Error initializing YDLIDAR check status.\n");
-        fflush(stderr);
+        ROS_ERROR("[CYdLidar::initialize] Error initializing YDLIDAR check status.");
         return false;
     }
 
