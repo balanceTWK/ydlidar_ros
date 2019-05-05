@@ -282,7 +282,7 @@ bool  CYdLidar::turnOn()
     if (checkLidarAbnormal())
     {
         lidarPtr->stop();
-        ROS_ERROR"[CYdLidar] Failed to turn on the Lidar, because the lidar is blocked or the lidar hardware is faulty.");
+        ROS_ERROR("[CYdLidar] Failed to turn on the Lidar, because the lidar is blocked or the lidar hardware is faulty.");
         isScanning = false;
         return false;
     }
@@ -351,7 +351,7 @@ bool CYdLidar::getDeviceHealth()
 
     if (IS_OK(op_result))
     {
-        ROS_INFO"[YDLIDAR]:Lidar running correctly ! The health status: %s",
+        ROS_INFO("[YDLIDAR]:Lidar running correctly ! The health status: %s",
                (int)healthinfo.status == 0 ? "good" : "bad");
 
         if (healthinfo.status == 2)
@@ -568,7 +568,7 @@ bool  CYdLidar::checkCOMMs()
 
         if (!lidarPtr)
         {
-            ROS_ERROR"Create Driver fail");
+            ROS_ERROR("Create Driver fail");
             return false;
         }
     }
@@ -601,7 +601,8 @@ bool  CYdLidar::checkCOMMs()
                 m_SerialPort.c_str(), m_SerialBaudrate);
         return false;
     }
-
+    ROS_INFO("[CYdLidar] Success bind to the specified serial port[%s] and baudrate[%d]",
+                m_SerialPort.c_str(), m_SerialBaudrate);
     return true;
 }
 
