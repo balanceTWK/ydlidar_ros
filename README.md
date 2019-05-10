@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.4.0
+YDLIDAR ROS PACKAGE V1.4.1
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -70,6 +70,10 @@ ignore_array (string, default: "")
 
 Upgrade Log
 =====================================================================
+
+2019-05-10 version:1.4.1
+
+   1.fix memory leak.
 
 2018-06-19 version:1.3.3
 
