@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.4.0
+YDLIDAR ROS PACKAGE V1.4.1
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -77,6 +77,10 @@ ignore_array (string, default: "")
 
 Upgrade Log
 =====================================================================
+
+2019-05-10 version:1.4.1
+
+  1.optimize the timestamp
 
 2019-04-09 version:1.4.0
 
