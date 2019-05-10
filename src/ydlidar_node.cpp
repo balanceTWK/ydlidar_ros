@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.9"
+#define ROSVerision "1.4.1"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -116,7 +116,7 @@ int main(int argc, char * argv[]) {
 
     while (ros::ok()) {
         bool hardError;
-        LaserScan scan;//原始激光数据
+        LaserScan scan;//
         if(laser.doProcessSimple(scan, hardError )){
             sensor_msgs::LaserScan scan_msg;
             ros::Time start_scan_time;
