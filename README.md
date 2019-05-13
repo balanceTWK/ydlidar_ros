@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V2.0.5
+YDLIDAR ROS PACKAGE V1.4.1
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -55,19 +55,15 @@ glass_noise (bool, default: true)
 
     indicated whether to turn off glass noise.
 
-calibration_filename (string, default: LidarAngleCalibration.ini)
-
-    Lidar zero angle calibration file.
-
 resolution_fixed (bool, default: true)
 
     indicated whether the LIDAR has a fixed angular resolution.
 
-angle_min (double, default: 0)
+angle_min (double, default: -180)
 
     Min valid angle (°) for LIDAR data.
 
-angle_max (double, default: 360)
+angle_max (double, default: 180)
 
     Max valid angle (°) for LIDAR data.
 
@@ -97,33 +93,11 @@ max_abnormal_check_count (int, default: 2)
 Upgrade Log
 ------------------------------------------------------------
 
-2019-03-01 version:2.0.5
+2019-05-13 version:1.4.1
 
-   1.fix Large motor resistance at startup issues.
+   1.fix ignore array
 
-2019-02-13 version:2.0.4
-
-   1.fix ascendScanData timestamp issues.
-
-2019-01-23 version:2.0.3
-
-   1.Change the Lidar coordinate system to clockwise, ranging from 0 to 360 degrees.
-
-2019-01-17 version:2.0.2
-
-   1.check lidar abnormality when turn on lidar.
-
-2019-01-15 version:2.0.1
-
-   1.support G4 Lidar.
-   
-2019-01-03 version:2.0.0
-
-   1.Remove other lidar model interfaces functions.
-
-   2.fix turnOn function.
-   
-   3.Lidar supports zero offset angle adjustment.
+   2.Optimize starting point timestamp
 
 2018-11-24 version:1.3.8
 

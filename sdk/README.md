@@ -15,10 +15,12 @@ Release Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 | Title      |  Version |  Data |
 | :-------- | --------:|  :--: |
-| SDK     |  2.0.5 |   2019-03-01  |
+| SDK     |  1.4.1 |   2019-05-13  |
 
 
-- [new feature] User can set the maximum number of abnormal checks.
+- [fix] fix ignore array
+
+- [fix] Optimize starting point timestamp
 
 
 
@@ -29,18 +31,14 @@ Dataset
 
 | Model      |  Baudrate |  Sampling Frequency | Range(m)  | Scanning Frequency(HZ) | Working temperature(°C) | Laser power max(mW) | voltage(V) | Current(mA)
 | :-------- | --------:|--------:|  --------:| --------:|--------:| --------:| --------:|  :--: |
-| G2-SS-1 |  230400 |   5000  |  0.1-16   |5-12|0-50| ~5|4.8-5.2|400-480|
+| R2     |  230400 |   5000  |  0.1-16   |5-12|0-50| ~5|4.8-5.2|400-480|
 | G4     |  230400 |   9000  |  0.26-16   |5-12|0-50| ~5|4.8-5.2|400-480|
-| X4     |  128000 |   5000  |  0.12-10   |5-12|0-40| ~5|4.8-5.2|330-380|
-| F4     | 115200 |   4000 |  0.1-12        |5-12|0-40| ~5|4.8-5.2|400-480|
-| S4     |  115200|    4000 |  0.1-8        |6-12|0-40| ~5|4.8-5.2|330-380|
-| S4Pro |  153600|    4000 |  0.1-8        |6-12|0-40| ~5|4.8-5.2|330-380|
 
 How to build YDLIDAR SDK samples
 ---------------
     $ git clone https://github.com/ydlidar/sdk
     $ cd sdk
-    $ git checkout samsung
+    $ git checkout R2
     $ cd ..
     $ mkdir build
     $ cd build
@@ -65,12 +63,12 @@ windows:
 
 You should see YDLIDAR's scan result in the console:
 
-	[YDLIDAR]:SDK Version: 2.0.0
+	[YDLIDAR]:SDK Version: 1.4.1
 	[YDLIDAR]:Lidar running correctly ! The health status: good
 	[YDLIDAR] Connection established in [/dev/ttyUSB0][230400]:
 	Firmware version: 1.2
 	Hardware version: 3
-	Model: G2-SS-1
+	Model: R2
 	Serial: 2018101800011111
 	[YDLIDAR INFO] Current Sampling Rate : 5K
 	[YDLIDAR INFO] Successfully obtained the offset angle[0.0000] from the lidar[2018101800011111]
@@ -208,75 +206,11 @@ Coordinate System
 Upgrade Log
 ---------------
 
-2019-03-01 version:2.0.5
+2019-05-13 version:1.4.1
 
-   1.fix Large motor resistance at startup issues.
+   1.fix ignore array
 
-2019-02-13 version:2.0.4
-
-   1.fix ascendScanData timestamp issues.
-
-2019-01-23 version:2.0.3
-
-   1.Change the Lidar coordinate system to clockwise, ranging from 0 to 360 degrees.
-
-2019-01-17 version:2.0.2
-
-   1.check lidar abnormality when turn on lidar.
-
-2019-01-15 version:2.0.1
-
-   1.support G4 lidar
-
-2019-01-03 version:2.0.0
-
-   1.Remove other lidar model interfaces functions.
-
-   2.fix turnOn function.
-   
-   3.Lidar supports zero offset angle adjustment.
-
-2018-12-07 version:1.3.9
-
-   1.Remove other lidar model interfaces functions.
-
-   2.Remove heartbeat
-
-2018-11-24 version:1.3.8
-
-   1.Reduce abnormal situation recovery time.
-   
-   2.fix timestamp from zero.
-
-2018-10-26 version:1.3.7
-
-   1.add input angle calibration file.
-   
-   2.remove network.
-
-2018-10-15 version:1.3.6
-
-   1.add network support.
-
-2018-05-23 version:1.3.4
-
-   1.add automatic reconnection if there is an exception
-
-   2.add serial file lock.
-
-2018-05-14 version:1.3.3
-
-   1.add the heart function constraint.
-
-   2.add packet type with scan frequency support.
-
-2018-04-16 version:1.3.2
-
-   1.add multithreading support.
-
-2018-04-16 version:1.3.1
-
-   1.Compensate for each laser point timestamp.
+   2.Optimize starting point timestam
    
    
    Contact EAI

@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "2.0.5"
+#define ROSVerision "1.4.1"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -67,10 +67,9 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
     nh_private.param<bool>("sun_noise", sun_noise, "true");
     nh_private.param<bool>("glass_noise", glass_noise, "true");
-    nh_private.param<std::string>("calibration_filename", calibration_filename, "LidarAngleCalibration.ini");
     nh_private.param<bool>("reversion", reversion, "false");
-    nh_private.param<double>("angle_max", angle_max , 360);
-    nh_private.param<double>("angle_min", angle_min , 0);
+    nh_private.param<double>("angle_max", angle_max , 180);
+    nh_private.param<double>("angle_min", angle_min , -180);
     nh_private.param<double>("range_max", max_range , 16.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("frequency", frequency , 7.0);
@@ -121,7 +120,6 @@ int main(int argc, char * argv[]) {
     laser.setSampleRate(samp_rate);
     laser.setAbnormalCheckCount(max_abnormal_check_count);
     laser.setIgnoreArray(ignore_array);
-    laser.setCalibrationFileName(calibration_filename);//Zero angle offset filename
     bool ret = laser.initialize();
     if (ret) {
         ret = laser.turnOn();
@@ -135,7 +133,7 @@ int main(int argc, char * argv[]) {
 
     while (ret&&ros::ok()) {
         bool hardError;
-        LaserScan scan;//原始激光数据
+        LaserScan scan;//
         if(laser.doProcessSimple(scan, hardError )){
             sensor_msgs::LaserScan scan_msg;
             ros::Time start_scan_time;
@@ -143,9 +141,9 @@ int main(int argc, char * argv[]) {
             start_scan_time.nsec = scan.system_time_stamp%1000000000ul;
             scan_msg.header.stamp = start_scan_time;
             scan_msg.header.frame_id = frame_id;
-            scan_msg.angle_min =DEG2RAD(scan.config.min_angle);
-            scan_msg.angle_max = DEG2RAD(scan.config.max_angle);
-            scan_msg.angle_increment = DEG2RAD(scan.config.ang_increment);
+            scan_msg.angle_min =(scan.config.min_angle);
+            scan_msg.angle_max = (scan.config.max_angle);
+            scan_msg.angle_increment = (scan.config.ang_increment);
             scan_msg.scan_time = scan.config.scan_time;
             scan_msg.time_increment = scan.config.time_increment;
             scan_msg.range_min = (scan.config.min_range);
