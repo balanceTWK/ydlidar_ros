@@ -52,10 +52,10 @@
 
 #define PackageSampleMaxLngth 0x100
 typedef enum {
-  CT_Normal = 0,
-  CT_RingStart  = 1,
-  CT_Tail,
-} CT;
+    CT_Normal = 0,
+    CT_RingStart  = 1,
+    CT_Tail,
+}CT;
 #define Node_Default_Quality (10<<2)
 #define Node_Sync 1
 #define Node_NotSync 2

@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.3.6"
+#define ROSVerision "1.4.1"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -95,13 +95,13 @@ int main(int argc, char *argv[]) {
   laser.setAutoReconnect(auto_reconnect);
   laser.setReversion(reversion);
   laser.setIgnoreArray(ignore_array);
-  laser.initialize();
+  bool ret = laser.initialize();
 
   ros::Rate rate(30);
 
-  while (ros::ok()) {
+  while (ret && ros::ok()) {
     bool hardError;
-    LaserScan scan;//原始激光数据
+    LaserScan scan;//
 
     if (laser.doProcessSimple(scan, hardError)) {
       sensor_msgs::LaserScan scan_msg;

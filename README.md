@@ -1,4 +1,4 @@
-YDLIDAR ROS PACKAGE V1.3.3
+YDLIDAR ROS PACKAGE V1.4.1
 =====================================================================
 
 ROS node and test application for YDLIDAR
@@ -59,14 +59,6 @@ reversion (bool, default: false)
 
     indicated whether the LIDAR IS reversion.
 
-debug (bool, default: false)
-
-        indicated whether the LIDAR IS enable debug.
-
-wait_delay (int, default: 0)
-
-        indicated whether the LIDAR IS reconnected once after [wait_delay]S.
-
 resolution_fixed (bool, default: true)
 
     indicated whether the LIDAR has a fixed angular resolution.
@@ -104,6 +96,10 @@ frequency (double, default: 7)
 
 Upgrade Log
 =====================================================================
+
+2019-05-13 version:1.4.1
+
+   1.fix timestamp
 
 2018-06-19 version:1.3.3
 

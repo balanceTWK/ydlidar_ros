@@ -99,6 +99,10 @@ struct lidar_ans_header {
   uint8_t  type;
 } __attribute__((packed));
 
+#if defined(_WIN32)
+#pragma pack()
+#endif
+
 
 //! A struct for returning configuration from the YDLIDAR
 struct LaserConfig {

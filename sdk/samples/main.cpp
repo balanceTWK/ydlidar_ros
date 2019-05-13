@@ -12,6 +12,8 @@ using namespace ydlidar;
 
 int main(int argc, char *argv[]) {
 
+  ydlidar::init(argc, argv);
+
   std::string port;
   std::string baudrate;
   int baud = 115200;
@@ -38,23 +40,26 @@ int main(int argc, char *argv[]) {
   }
 
 
+  if (!ydlidar::ok()) {
+    return 0;
+  }
 
 
-  ydlidar::init(argc, argv);
   CYdLidar laser;
   laser.setSerialPort(port);
   laser.setSerialBaudrate(baud);
   laser.setFixedResolution(false);
   laser.setReversion(false);
   laser.setAutoReconnect(true);
-  laser.initialize();
+  bool ret = laser.initialize();
 
-  while (ydlidar::ok()) {
+  while (ret && ydlidar::ok()) {
     bool hardError;
     LaserScan scan;
 
     if (laser.doProcessSimple(scan, hardError)) {
-      fprintf(stdout, "Scan received: %u ranges\n", (unsigned int)scan.ranges.size());
+      fprintf(stdout, "Scan received: %u ranges in %f HZ\n",
+              (unsigned int)scan.ranges.size(), 1.0 / scan.config.scan_time);
       fflush(stdout);
     }
   }
