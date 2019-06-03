@@ -111,14 +111,12 @@ struct pose2D_t {
 
 struct node_info {
   uint8_t    sync_flag;  //sync flag
+  uint8_t    single_package_flag;
   uint16_t   sync_quality;//!信号质量
   uint16_t   angle_q6_checkbit; //!测距点角度
   uint16_t   distance_q; //! 当前测距点距离
   uint64_t   stamp; //! 时间戳
   uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0
-  float dx;
-  float dy;
-  float dth;
 } __attribute__((packed)) ;
 
 struct PackageNode {

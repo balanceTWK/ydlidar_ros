@@ -106,12 +106,6 @@ class YDlidarDriver {
   void setAutoReconnect(const bool &enable);
 
   /**
-   * @brief setOdometry
-   * @param odom
-   */
-  void setOdometry(const odom_t &odom);
-
-  /**
   * @brief 获取雷达设备信息 \n
   * @param[in] info     设备信息
   * @param[in] timeout  超时时间
@@ -119,7 +113,8 @@ class YDlidarDriver {
   * @retval RESULT_OK       获取成功
   * @retval RESULT_FAILE or RESULT_TIMEOUT   获取失败
   */
-  result_t getDeviceInfo(std::string &buffer, size_t& size, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t getDeviceInfo(std::string &buffer, size_t &size,
+                         uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 开启扫描 \n
@@ -151,7 +146,8 @@ class YDlidarDriver {
   * @retval RESULT_FAILE    获取失败
   * @note 获取之前，必须使用::startScan函数开启扫描
   */
-  result_t grabScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT) ;
+  result_t grabScanData(node_info *nodebuffer, size_t &count,
+                        uint32_t timeout = DEFAULT_TIMEOUT) ;
 
 
   /**
@@ -220,7 +216,8 @@ class YDlidarDriver {
   * @retval RESULT_TIMEOUT  等待超时
   * @retval RESULT_FAILE    失败
   */
-  result_t waitScanData(node_info *nodebuffer, size_t &count, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitScanData(node_info *nodebuffer, size_t &count,
+                        uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 激光数据解析线程 \n
@@ -236,7 +233,8 @@ class YDlidarDriver {
   * @retval RESULT_OK       成功
   * @retval RESULT_FAILE    失败
   */
-  result_t sendCommand(uint8_t cmd, const void *payload = NULL, size_t payloadsize = 0);
+  result_t sendCommand(uint8_t cmd, const void *payload = NULL,
+                       size_t payloadsize = 0);
 
   /**
   * @brief 等待激光数据包头 \n
@@ -248,7 +246,8 @@ class YDlidarDriver {
   * @retval RESULT_FAILE    获取失败
   * @note 当timeout = -1 时, 将一直等待
   */
-  result_t waitResponseHeader(lidar_ans_header *header, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitResponseHeader(lidar_ans_header *header,
+                              uint32_t timeout = DEFAULT_TIMEOUT);
 
 
   /**
@@ -258,7 +257,8 @@ class YDlidarDriver {
    * @param timeout
    * @return
    */
-  result_t waitResponseStartHeader(std::string &buffer, size_t& size, uint32_t timeout = DEFAULT_TIMEOUT);
+  result_t waitResponseStartHeader(std::string &buffer, size_t &size,
+                                   uint32_t timeout = DEFAULT_TIMEOUT);
 
   /**
   * @brief 等待固定数量串口数据 \n
@@ -404,10 +404,6 @@ class YDlidarDriver {
   uint16_t Valu8Tou16;
 
   std::string serial_port;///< 雷达端口
-
-  std::list<odom_t> m_odom;
-  odom_t last_odom;
-  odom_t current_odom;
 
 };
 }

@@ -21,13 +21,14 @@ int main(int argc, char *argv[]) {
 
   ydlidar::init(argc, argv);
 
-  std::map<std::string, std::string> ports =  ydlidar::YDlidarDriver::lidarPortList();
+  std::map<std::string, std::string> ports =
+    ydlidar::YDlidarDriver::lidarPortList();
   std::map<std::string, std::string>::iterator it;
 
   if (ports.size() == 1) {
     it = ports.begin();
     printf("Lidar[%s] detected, whether to select current radar(yes/no)?:",
-                          it->first.c_str());
+           it->first.c_str());
     std::string ok;
     std::cin >> ok;
 
@@ -76,19 +77,15 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if(!ydlidar::ok()) {
+  if (!ydlidar::ok()) {
     return 0;
   }
+
   CYdLidar laser;
   laser.setSerialPort(port);
   laser.setSerialBaudrate(214285);
   laser.setIntensities(true);//intensity
-  laser.setFixedResolution(false);
   laser.setAutoReconnect(true);//hot plug
-
-  //unit: °
-  laser.setMaxAngle(180);
-  laser.setMinAngle(-180);
 
   //unit: m
   laser.setMinRange(0.1);
@@ -99,13 +96,15 @@ int main(int argc, char *argv[]) {
   laser.setIgnoreArray(ignore_array);
 
   bool ret = laser.initialize();
+
   while (ret && ydlidar::ok()) {
     bool hardError;
     LaserScan scan;
 
     if (laser.doProcessSimple(scan, hardError)) {
-      fprintf(stdout, "Scan received[%llu]: %u ranges is [%f]Hz\n", scan.self_time_stamp,
-              (unsigned int)scan.ranges.size(), 1.0 / scan.config.scan_time);
+      fprintf(stdout, "Scan received[%llu]: %u ranges is [%f]s\n",
+              scan.self_time_stamp,
+              (unsigned int)scan.ranges.size(), scan.config.scan_time);
       fflush(stdout);
     } else {
       fprintf(stderr, "Failed to get Lidar Data\n");

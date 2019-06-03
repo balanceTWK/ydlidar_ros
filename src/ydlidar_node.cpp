@@ -129,7 +129,7 @@ int main(int argc, char * argv[]) {
             scan_msg.intensities =  scan.intensities;
             scan_pub.publish(scan_msg);
         }  
-        rate.sleep();
+        //rate.sleep();
         ros::spinOnce();
     }
 
