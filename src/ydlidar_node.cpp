@@ -106,7 +106,7 @@ int main(int argc, char * argv[]) {
     } else {
         ROS_ERROR("Error initializing YDLIDAR Comms and Status!!!");
     }
-    ros::Rate rate(20);
+    ros::Rate rate(200);
 
     while (ret&&ros::ok()) {
         bool hardError;
