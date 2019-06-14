@@ -207,6 +207,9 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError)
                 {
                     range = 0.0;
                 }
+                if(range == 0.0) {
+                    range = std::numeric_limits<float>::infinity();
+                }
 
                 int pos = index - node_start ;
                 if (0 <= pos && pos < counts)
