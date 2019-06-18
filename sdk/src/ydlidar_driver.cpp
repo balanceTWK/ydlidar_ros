@@ -787,11 +787,9 @@ result_t YDlidarDriver::waitPackage(node_info *node, uint32_t timeout) {
                                            & 0x03) << LIDAR_RESP_MEASUREMENT_ANGLE_SAMPLE_SHIFT) |
                               (package.packageSample[package_Sample_Index].PakageSampleQuality));
       (*node).distance_q =
-        package.packageSample[package_Sample_Index].PakageSampleDistance >>
-        LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT;
+        package.packageSample[package_Sample_Index].PakageSampleDistance;
     } else {
-      (*node).distance_q = packages.packageSampleDistance[package_Sample_Index] >>
-                           LIDAR_RESP_MEASUREMENT_DISTANCE_SHIFT;
+      (*node).distance_q = packages.packageSampleDistance[package_Sample_Index];
       (*node).sync_quality = ((uint16_t)(0xfc |
                                          packages.packageSampleDistance[package_Sample_Index] &
                                          0x0003)) << LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT;

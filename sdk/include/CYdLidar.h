@@ -3,7 +3,6 @@
 #include "utils.h"
 #include "ydlidar_driver.h"
 #include <math.h>
-#include "matrix/math.hpp"
 
 using namespace ydlidar;
 

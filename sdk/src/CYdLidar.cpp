@@ -81,7 +81,7 @@ bool  CYdLidar::doProcessSimple(LaserScan &outscan, bool &hardwareError) {
     for (int i = 0; i < count; i++) {
       angle = (float)((nodes[i].angle_q6_checkbit >>
                        LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT) / 64.0f);
-      range = (float)nodes[i].distance_q / 1000.f;
+      range = (float)nodes[i].distance_q / 4.f / 1000.f;
       intensity = (float)(nodes[i].sync_quality >>
                           LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
 
