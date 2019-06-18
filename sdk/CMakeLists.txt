@@ -7,7 +7,6 @@ INCLUDE_DIRECTORIES(
      )
 include_directories(include)
 include_directories(src)
-include_directories(matrix)
 
 
 IF (WIN32)
@@ -17,7 +16,6 @@ FILE(GLOB SDK_SRC
   "src/*.h"
   "src/impl/windows/*.cpp"
   "src/impl/windows/*.h"
-  "matrix/*.hpp"
 )
 	
 ELSE()
@@ -27,7 +25,6 @@ FILE(GLOB SDK_SRC
   "src/*.h"
   "src/impl/unix/*.cpp"
   "src/impl/unix/*.h"
-  "matrix/*.hpp"
 )
 
 	

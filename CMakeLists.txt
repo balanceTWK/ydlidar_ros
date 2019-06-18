@@ -24,7 +24,6 @@ catkin_package()
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/sdk
-  ${PROJECT_SOURCE_DIR}/sdk/matrix
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/sdk/include
   ${PROJECT_SOURCE_DIR}/sdk/src

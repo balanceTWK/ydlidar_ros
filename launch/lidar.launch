@@ -1,15 +1,11 @@
 <launch>
   <node name="ydlidar_node"  pkg="ydlidar"  type="ydlidar_node" output="screen" respawn="false" >
-    <param name="port"         type="string" value="/dev/ydlidar"/>  
-    <param name="port"         type="int"    value="214285"/>  
+    <param name="port"         type="string" value="/dev/ttyUSB0"/>  
+    <param name="port"         type="int"    value="921600"/>  
     <param name="frame_id"     type="string" value="laser_frame"/>
-    <param name="resolution_fixed"    type="bool"   value="true"/>
     <param name="auto_reconnect"    type="bool"   value="true"/>
-    <param name="reversion"    type="bool"   value="false"/>
-    <param name="sun_noise"    type="bool"   value="true"/>
-    <param name="glass_noise"    type="bool"   value="true"/>
-    <param name="angle_min"    type="double" value="-180" />
-    <param name="angle_max"    type="double" value="180" />
+    <param name="angle_min"    type="double" value="-60" />
+    <param name="angle_max"    type="double" value="0" />
     <param name="range_min"    type="double" value="0.1" />
     <param name="range_max"    type="double" value="16.0" />
     <param name="ignore_array" type="string" value="" />

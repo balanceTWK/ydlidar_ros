@@ -114,11 +114,7 @@ struct node_info {
   uint16_t   sync_quality;//!信号质量
   uint16_t   angle_q6_checkbit; //!测距点角度
   uint16_t   distance_q; //! 当前测距点距离
-  uint64_t   stamp; //! 时间戳
   uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0
-  float dx;
-  float dy;
-  float dth;
 } __attribute__((packed)) ;
 
 struct PackageNode {
@@ -210,14 +206,18 @@ struct lidar_ans_header {
 #pragma pack()
 #endif
 
+struct LaserPoint {
+  float angle;
+  float range;
+  float intensity;
+};
+
 //! A struct for returning configuration from the YDLIDAR
 struct LaserConfig {
   //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float min_angle;
   //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float max_angle;
-  //! Scan resolution [rad].
-  float ang_increment;
   //! Scan resoltuion [s]
   float time_increment;
   //! Time between scans
@@ -226,8 +226,6 @@ struct LaserConfig {
   float min_range;
   //! Maximum range [m]
   float max_range;
-  //! Range Resolution [m]
-  float range_res;
 };
 
 
@@ -241,12 +239,8 @@ struct LaserConfig {
 //!
 //!
 struct LaserScan {
-  //! Array of ranges
-  std::vector<float> ranges;
-  //! Array of intensities
-  std::vector<float> intensities;
-  //! Self reported time stamp in nanoseconds
-  uint64_t self_time_stamp;
+  //! Array of laser point
+  std::vector<LaserPoint> data;
   //! System time when first range was measured in nanoseconds
   uint64_t system_time_stamp;
   //! Configuration of scan

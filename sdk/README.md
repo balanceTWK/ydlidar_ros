@@ -40,7 +40,7 @@ How to build YDLIDAR SDK samples
 ---------------
     $ git clone https://github.com/ydlidar/sdk
     $ cd sdk
-    $ git checkout temi_sync_imu
+    $ git checkout GT
     $ cd ..
     $ mkdir build
     $ cd build

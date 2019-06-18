@@ -59,11 +59,11 @@ resolution_fixed (bool, default: true)
 
     indicated whether the LIDAR has a fixed angular resolution.
 
-angle_min (double, default: -180)
+angle_min (double, default: -60)
 
     Min valid angle (°) for LIDAR data.
 
-angle_max (double, default: 180)
+angle_max (double, default: 0)
 
     Max valid angle (°) for LIDAR data.
 

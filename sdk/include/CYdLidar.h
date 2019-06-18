@@ -8,22 +8,24 @@
 using namespace ydlidar;
 
 class YDLIDAR_API CYdLidar {
-  PropertyBuilderByName(float, MaxRange, private) ///< 设置和获取激光最大测距范围(m)
-  PropertyBuilderByName(float, MinRange, private) ///< 设置和获取激光最小测距范围(m)
+  PropertyBuilderByName(float, MaxRange,
+                        private) ///< 设置和获取激光最大测距范围(m)
+  PropertyBuilderByName(float, MinRange,
+                        private) ///< 设置和获取激光最小测距范围(m)
   PropertyBuilderByName(float, MaxAngle,
                         private) ///< 设置和获取激光最大角度, 最大值180度(度)
   PropertyBuilderByName(float, MinAngle,
                         private) ///< 设置和获取激光最小角度, 最小值-180度(度)
   PropertyBuilderByName(bool, Intensities,
                         private) ///< 设置和获取激光带信号质量(只有S4B雷达支持)
-  PropertyBuilderByName(bool, FixedResolution,
-                        private) ///< 设置和获取激光是否是固定角度分辨率
-  PropertyBuilderByName(bool, AutoReconnect, private) ///< 设置异常是否开启重新连接
-  PropertyBuilderByName(bool, GlassNoise, private) ///< 设置是否关闭玻璃噪声干扰
-  PropertyBuilderByName(bool, SunNoise, private) ///< 设置是否关闭太阳干扰
-  PropertyBuilderByName(int, SerialBaudrate, private) ///< 设置和获取激光通讯波特率
-  PropertyBuilderByName(std::string, SerialPort, private) ///< 设置和获取激光端口号
-  PropertyBuilderByName(std::vector<float>, IgnoreArray, private) ///< 设置和获取激光剔除点
+  PropertyBuilderByName(bool, AutoReconnect,
+                        private) ///< 设置异常是否开启重新连接
+  PropertyBuilderByName(int, SerialBaudrate,
+                        private) ///< 设置和获取激光通讯波特率
+  PropertyBuilderByName(std::string, SerialPort,
+                        private) ///< 设置和获取激光端口号
+  PropertyBuilderByName(std::vector<float>, IgnoreArray,
+                        private) ///< 设置和获取激光剔除点
 
 
  public:
@@ -76,25 +78,12 @@ class YDLIDAR_API CYdLidar {
     */
   bool checkHardware();
 
-  /** Returns true if the device information is correct, If it's not*/
-  bool getDeviceInfo();
-
 
   /** returns true if the lidar data is normal, If it's not*/
   bool checkLidarAbnormal();
 
  private:
   bool    isScanning;
-  int     node_counts ;
-  double  each_angle;
   YDlidarDriver *lidarPtr;
-
-  matrix::SquareMatrix<double, 3> sensor_matrix;
-  matrix::SquareMatrix<double, 3> sensor_matrix_inv;
-  matrix::SquareMatrix<double, 3> robot_matrix;
-  matrix::Vector<double, 3> lidar_sensor_vector;
-  matrix::Vector<double, 3> current_sensor_vector;
-
-
 };	// End of class
 
