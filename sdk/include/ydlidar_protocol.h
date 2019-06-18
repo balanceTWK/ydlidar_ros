@@ -78,7 +78,7 @@
 #define LIDAR_CMD_SET_HEART_BEAT        0xD9
 #define LIDAR_CMD_SET_SETPOINTSFORONERINGFLAG  0xae
 
-#define MAXIMUQUEUE 20
+#define MAX_QUEUE_SIZE 30
 
 #define PackageSampleMaxLngth 0x100
 typedef enum {
@@ -101,12 +101,25 @@ struct odom_t {
   float x;
   float y;
   float theta;
+  odom_t &operator = (const odom_t &data) {
+    time_now = data.time_now;
+    x = data.x;
+    y = data.y;
+    theta = data.theta;
+    return *this;
+  }
 };
 
 struct pose2D_t {
   float x;
   float y;
   float theta;
+  pose2D_t &operator = (const pose2D_t &data) {
+    x = data.x;
+    y = data.y;
+    theta = data.theta;
+    return *this;
+  }
 };
 
 struct node_info {
@@ -114,11 +127,7 @@ struct node_info {
   uint16_t   sync_quality;//!信号质量
   uint16_t   angle_q6_checkbit; //!测距点角度
   uint16_t   distance_q2; //! 当前测距点距离
-  uint64_t   stamp; //! 时间戳
   uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0
-  float dx;
-  float dy;
-  float dth;
 } __attribute__((packed)) ;
 
 struct PackageNode {
@@ -210,14 +219,25 @@ struct lidar_ans_header {
 #pragma pack()
 #endif
 
+
+struct LaserPoint {
+  float angle;
+  float range;
+  float intensity;
+  LaserPoint &operator = (const LaserPoint &data) {
+    angle = data.angle;
+    range = data.range;
+    intensity = data.intensity;
+    return *this;
+  }
+};
+
 //! A struct for returning configuration from the YDLIDAR
 struct LaserConfig {
   //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float min_angle;
   //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float max_angle;
-  //! Scan resolution [rad].
-  float ang_increment;
   //! Scan resoltuion [s]
   float time_increment;
   //! Time between scans
@@ -226,29 +246,30 @@ struct LaserConfig {
   float min_range;
   //! Maximum range [m]
   float max_range;
-  //! Range Resolution [m]
-  float range_res;
+  LaserConfig &operator = (const LaserConfig &data) {
+    min_angle = data.min_angle;
+    max_angle = data.max_angle;
+    time_increment = data.time_increment;
+    scan_time = data.scan_time;
+    min_range = data.min_range;
+    max_range = data.max_range;
+    return *this;
+  }
 };
 
 
-//! A struct for returning laser readings from the YDLIDAR
-//! currentAngle = min_angle + ang_increment*index
-//! for( int i =0; i < ranges.size(); i++) {
-//!     double currentAngle = config.min_angle + i*config.ang_increment;
-//!     double currentDistance = ranges[i];
-//! }
-//!
-//!
-//!
 struct LaserScan {
-  //! Array of ranges
-  std::vector<float> ranges;
-  //! Array of intensities
-  std::vector<float> intensities;
-  //! Self reported time stamp in nanoseconds
-  uint64_t self_time_stamp;
+  //! Array of laser point
+  std::vector<LaserPoint> data;
   //! System time when first range was measured in nanoseconds
   uint64_t system_time_stamp;
   //! Configuration of scan
   LaserConfig config;
+  LaserScan &operator = (const LaserScan &data) {
+    this->data = data.data;
+    system_time_stamp = data.system_time_stamp;
+    config = data.config;
+    return *this;
+  }
 };
+

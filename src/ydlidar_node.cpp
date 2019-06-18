@@ -43,9 +43,7 @@ int main(int argc, char * argv[]) {
   
     std::string port;
     int baudrate=115200;
-    int count_fixed = -1;
     std::string frame_id;
-    bool reversion, resolution_fixed;
     bool auto_reconnect;
     double angle_max,angle_min;
     result_t op_result;
@@ -53,19 +51,19 @@ int main(int argc, char * argv[]) {
     std::vector<float> ignore_array;  
     double max_range, min_range;
     double frequency;
+    double offset_time = 0.0;
 
     ros::NodeHandle nh;
     ros::Publisher scan_pub = nh.advertise<sensor_msgs::LaserScan>("scan", 1000);
     ros::NodeHandle nh_private("~");
     nh_private.param<std::string>("port", port, "/dev/ydlidar"); 
     nh_private.param<std::string>("frame_id", frame_id, "laser_frame");
-    nh_private.param<bool>("resolution_fixed", resolution_fixed, "true");
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
     nh_private.param<double>("range_max", max_range , 12.0);
     nh_private.param<double>("range_min", min_range , 0.08);
-    nh_private.param<int>("count_fixed", count_fixed , -1);
+    nh_private.param<double>("offset_time", offset_time , 0.0);
     nh_private.param<std::string>("ignore_array",list,"");
 
     ignore_array = split(list ,',');
@@ -93,9 +91,8 @@ int main(int argc, char * argv[]) {
     laser.setMinRange(min_range);
     laser.setMaxAngle(angle_max);
     laser.setMinAngle(angle_min);
-    laser.setFixedResolution(resolution_fixed);
     laser.setAutoReconnect(auto_reconnect);
-    laser.setFixedCount(count_fixed);
+    laser.setOffsetTime(offset_time);
     laser.setIgnoreArray(ignore_array);
     bool ret = laser.initialize();
     if (ret) {
@@ -120,14 +117,35 @@ int main(int argc, char * argv[]) {
             scan_msg.header.frame_id = frame_id;
             scan_msg.angle_min =(scan.config.min_angle);
             scan_msg.angle_max = (scan.config.max_angle);
-            scan_msg.angle_increment = (scan.config.ang_increment);
             scan_msg.scan_time = scan.config.scan_time;
             scan_msg.time_increment = scan.config.time_increment;
             scan_msg.range_min = (scan.config.min_range);
             scan_msg.range_max = (scan.config.max_range);
+            int size = scan.data.size();
+            if(scan.config.max_angle - scan.config.min_angle == 2*M_PI) {
+                scan_msg.angle_increment = (scan.config.max_angle - scan.config.min_angle) / (size);
+            } else {
+                scan_msg.angle_increment = (scan.config.max_angle - scan.config.min_angle) / (size - 1);
+            }
+
+            int index = 0;
+            scan_msg.ranges.resize(size, std::numeric_limits<float>::infinity());
+            scan_msg.intensities.resize(size, 0);
+            for(int i = 0; i < size; i++) {
+                LaserPoint point = scan.data[i];
+                index = (point.angle - scan.config.min_angle ) / scan_msg.angle_increment + 0.5;
+                if(index >=0 && index < size) {
+                    if(point.range == 0.0) {
+                        scan_msg.ranges[index] = std::numeric_limits<float>::infinity();
+                        scan_msg.intensities[index] = 0;
+                    } else {
+                        scan_msg.ranges[index] = point.range;
+                        scan_msg.intensities[index] = point.intensity;
+                    }
+                }
+
+            }
             
-            scan_msg.ranges = scan.ranges;
-            scan_msg.intensities =  scan.intensities;
             scan_pub.publish(scan_msg);
         }  
         rate.sleep();
