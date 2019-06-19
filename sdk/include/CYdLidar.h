@@ -14,17 +14,15 @@ class YDLIDAR_API CYdLidar {
   PropertyBuilderByName(float, MinRange,
                         private) ///< Constrained minimum distance(m)
   PropertyBuilderByName(float, MaxAngle,
-                        private) ///< constrained maximum angle, Maximum 180 Deg(Deg)
+                        private) ///< constrained maximum angle, Maximum 360 Deg(Deg)
   PropertyBuilderByName(float, MinAngle,
-                        private) ///< constrained minimum angle, minmum -180 Deg(Deg)
+                        private) ///< constrained minimum angle, minmum 0 Deg(Deg)
   PropertyBuilderByName(float, ScanFrequency,
                         private) ///< scan frequency (5HZ~12HZ)(HZ)
-
+  PropertyBuilderByName(float, OffsetTime, private)
+  PropertyBuilderByName(bool, Reversion, private) ///<
   PropertyBuilderByName(bool, Intensities,
                         private) ///< intensity
-  PropertyBuilderByName(bool, FixedResolution,
-                        private) ///< Whether it is a fixed angle resolution.
-  PropertyBuilderByName(bool, Reversion, private) ///< Whether to rotate 180 Deg
   PropertyBuilderByName(bool, AutoReconnect,
                         private) ///< whether to support hot swap
   PropertyBuilderByName(bool, GlassNoise,
@@ -54,7 +52,7 @@ class YDLIDAR_API CYdLidar {
   bool checkHardware();
 
   // Return true if laser data acquistion succeeds, If it's not
-  bool doProcessSimple(LaserScan &outscan, bool &hardwareError);
+  bool doProcessSimple(LaserScan &scan_msg, bool &hardwareError);
 
   //Turn on the motor enable
   bool  turnOn();  //!< See base class docs
@@ -65,11 +63,14 @@ class YDLIDAR_API CYdLidar {
   //Turn off lidar connection
   void disconnecting(); //!< Closes the comms with the laser. Shouldn't have to be directly needed by the user
 
-  //lidar pointer
-  YDlidarDriver *getYdlidarDriver();
+  //get fixed resolution node size
+  int getFixedSize() const;
 
   //get zero angle offset value
   float getAngleOffset() const;
+
+  //Whether the zero offset angle is corrected?
+  bool isAngleOffetCorrected() const;
 
  protected:
   /** Returns true if communication has been established with the device. If it's not,
@@ -107,13 +108,16 @@ class YDLIDAR_API CYdLidar {
 
  private:
   bool    isScanning;
-  int     node_counts ;
-  double  each_angle;
   float   frequencyOffset;
   float   m_AngleOffset;
+  bool    m_isAngleOffsetCorrected;
   uint8_t Major;
   uint8_t Minjor;
   YDlidarDriver *lidarPtr;
+  std::string m_serial_number;
+  uint32_t m_pointTime;
+  uint64_t last_node_time;
+  int m_FixedSize;
 
 };	// End of class
 

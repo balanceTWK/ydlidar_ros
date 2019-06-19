@@ -15,12 +15,9 @@ Release Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 | Title      |  Version |  Data |
 | :-------- | --------:|  :--: |
-| SDK     |  1.4.1 |   2019-05-13  |
+| SDK     |  1.4.1 |   2019-06-19  |
 
-
-- [fix] fix ignore array
-
-- [fix] Optimize starting point timestamp
+- [new feature] increase the deviation between correcting the zero angle of the lidar and the zero angle of the robot.
 
 
 
@@ -31,7 +28,7 @@ Dataset
 
 | Model      |  Baudrate |  Sampling Frequency | Range(m)  | Scanning Frequency(HZ) | Working temperature(°C) | Laser power max(mW) | voltage(V) | Current(mA)
 | :-------- | --------:|--------:|  --------:| --------:|--------:| --------:| --------:|  :--: |
-| R2     |  230400 |   5000  |  0.1-16   |5-12|0-50| ~5|4.8-5.2|400-480|
+| R2 |  230400 |   5000  |  0.1-16   |5-12|0-50| ~5|4.8-5.2|400-480|
 | G4     |  230400 |   9000  |  0.26-16   |5-12|0-50| ~5|4.8-5.2|400-480|
 
 How to build YDLIDAR SDK samples
@@ -48,7 +45,6 @@ How to build YDLIDAR SDK samples
 
 How to run YDLIDAR SDK samples
 ---------------
-    $ cd samples
 
 linux:
 
@@ -63,7 +59,7 @@ windows:
 
 You should see YDLIDAR's scan result in the console:
 
-	[YDLIDAR]:SDK Version: 1.4.1
+	[YDLIDAR]:SDK Version: 2.0.8
 	[YDLIDAR]:Lidar running correctly ! The health status: good
 	[YDLIDAR] Connection established in [/dev/ttyUSB0][230400]:
 	Firmware version: 1.2
@@ -71,146 +67,74 @@ You should see YDLIDAR's scan result in the console:
 	Model: R2
 	Serial: 2018101800011111
 	[YDLIDAR INFO] Current Sampling Rate : 5K
-	[YDLIDAR INFO] Successfully obtained the offset angle[0.0000] from the lidar[2018101800011111]
+	[YDLIDAR INFO] Successfully obtained the corrected offset angle[0.0000] from the lidar[2018101800011111]
 	[YDLIDAR INFO] Current AngleOffset : 0.000000°
 	[YDLIDAR INFO] Current Scan Frequency : 8.000000Hz
 	[YDLIDAR INFO] Now YDLIDAR is scanning ......
 	Scan received: 625 ranges
 	Scan received: 626 ranges
 	
-	
-code:
-        
-        void ParseScan(node_info* data, const size_t& size) {
-
-            double current_frequence, current_distance, current_angle, current_intensity;
-
-            uint64_t current_time_stamp;
-
-            for (size_t i = 0; i < size; i++ ) {
-
-                if( data[i].scan_frequence != 0) {
-                
-                    current_frequence =  data[i].scan_frequence;//or current_frequence = data[0].scan_frequence
-                    
-                }
-
-                current_time_stamp = data[i].stamp;
-                
-                current_angle = ((data[i].angle_q6_checkbit>>LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f);//LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT equals 8
-
-                current_distance =  data[i].distance_q/4.f;
-
-                current_intensity = (float)(data[i].sync_quality);
-
-            }
-
-            if (current_frequence != 0 ) {
-
-                printf("current lidar scan frequency: %f\n", current_frequence);
-
-            } else {
-
-                printf("Current lidar does not support return scan frequency\n");
-
-            }
-        }
-
-
 
 Data structure
 -------------------------------------------------------------------------------------------------------------------------------------------------------
 
 data structure:
 
-    //! A struct for returning configuration from the YDLIDAR
-    struct LaserConfig {
+	struct LaserPoint {
+ 	 	//angle[°]
+  		float angle;
+  		//range[m]
+  		float range;
+ 	 	float intensity;
+	};
 
-        //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
-        float min_angle;
+	//! A struct for returning configuration from the YDLIDAR
+	struct LaserConfig {
+  		//! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
+ 		float min_angle;
+  		//! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
+  		float max_angle;
+  		//! Scan resoltuion [s]
+  		float time_increment;
+  		//! Time between scans[s]
+  		float scan_time;
+  		//! Minimum range [m]
+  		float min_range;
+  		//! Maximum range [m]
+ 		 float max_range;
+	};
 
-        //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
-        float max_angle;
-
-        //! Scan resolution [rad].
-        float ang_increment;
-
-        //! Scan resoltuion [ns]
-        float time_increment;
-
-        //! Time between scans
-        float scan_time;
-
-        //! Minimum range [m]
-        float min_range;
-
-        //! Maximum range [m]
-        float max_range;
-
-        //! Range Resolution [m]
-        float range_res;
-
-      };
-
-
-      struct LaserScan {
-
-        //! Array of ranges
-        std::vector<float> ranges;
-
-        //! Array of intensities
-        std::vector<float> intensities;
-
-        //! Self reported time stamp in nanoseconds
-        uint64_t self_time_stamp;
-
-        //! System time when first range was measured in nanoseconds
-        uint64_t system_time_stamp;
-
-        //! Configuration of scan
-        LaserConfig config;
-
-      };
+	struct LaserScan {
+ 		 //! Array of laser data point
+  		std::vector<LaserPoint> data;
+  		//! System time when first range was measured in nanoseconds
+  		uint64_t system_time_stamp;
+  		//! Configuration of scan
+  		LaserConfig config;
+	};
 
 example angle parsing:
 
     LaserScan scan;
 
-    for(size_t i =0; i < scan.ranges.size(); i++) {
+    for(size_t i =0; i < scan.data.size(); i++) {
 
-      // current angle
-      double angle = scan.config.min_angle + i*scan.config.ang_increment;// radian format
+      LaserPoint point = scan.data[i];
+
+      // current time stamp
+      uint64_t time_stamp = scan.system_time_stamp + i * scan.config.time_increment*1e9;
+
+      //current angle
+      double angle = point.angle;//°
 
       //current distance
-      double distance = scan.ranges[i];//meters
+      double distance = point.range;//meters
 
       //current intensity
-      int intensity = scan.intensities[i];
+      double intensity = point.intensity;
 
     }
-    
-
-Coordinate System
--------------------------------------------------------------------------------------------------------------------------------------------------------
-
-![Coordinate](image/image.png  "Coordinate")
-
-
-
-### The relationship between the angle value and the data structure in the above figure:
-
-	double current_angle =  scan.config.min_angle + index*scan.config.ang_increment;// radian format
-	doube Angle = current_angle*180/M_PI;//Angle fomat
-
-
-Upgrade Log
----------------
-
-2019-05-13 version:1.4.1
-
-   1.fix ignore array
-
-   2.Optimize starting point timestam
+   
    
    
    Contact EAI

@@ -18,7 +18,6 @@ int main(int argc, char *argv[]) {
   printf("\n");
   fflush(stdout);
   std::string port;
-
   ydlidar::init(argc, argv);
 
   std::map<std::string, std::string> ports =
@@ -27,7 +26,21 @@ int main(int argc, char *argv[]) {
 
   if (ports.size() == 1) {
     it = ports.begin();
-    port = it->second;
+    printf("Lidar[%s] detected, whether to select current radar(yes/no)?:",
+           it->first.c_str());
+    std::string ok;
+    std::cin >> ok;
+
+    for (size_t i = 0; i < ok.size(); i++) {
+      ok[i] = tolower(ok[i]);
+    }
+
+    if (ok.find("yes") != std::string::npos || atoi(ok.c_str()) == 1) {
+      port = it->second;
+    } else {
+      printf("Please enter the lidar serial port:");
+      std::cin >> port;
+    }
   } else {
     int id = 0;
 
@@ -87,11 +100,10 @@ int main(int argc, char *argv[]) {
   laser.setSerialPort(port);
   laser.setSerialBaudrate(230400);
   laser.setIntensities(false);//intensity
-  laser.setFixedResolution(false);
-  laser.setReversion(false); //
   laser.setAutoReconnect(true);//hot plug
+  laser.setReversion(false);
 
-  //unit: °
+  //unit: Deg
   laser.setMaxAngle(180);
   laser.setMinAngle(-180);
 
@@ -104,6 +116,7 @@ int main(int argc, char *argv[]) {
 
   //unit: Hz
   laser.setScanFrequency(frequency);
+
 
   //set the range of angles that need to be removed.
   //usage: [0, 10, 15,25, 80, 90]
@@ -122,9 +135,15 @@ int main(int argc, char *argv[]) {
     LaserScan scan;
 
     if (laser.doProcessSimple(scan, hardError)) {
-      fprintf(stdout, "Scan received[%llu]: %u ranges is [%f]Hz\n",
-              scan.self_time_stamp,
-              (unsigned int)scan.ranges.size(), 1.0 / scan.config.scan_time);
+      fprintf(stdout, "Scan received[%llu]: %u ranges(%u) is [%f]Hz\n",
+              scan.system_time_stamp,
+              (unsigned int)scan.data.size(), laser.getFixedSize(),
+              1.0 / scan.config.scan_time);
+
+      for (int i = 0; i < scan.data.size(); i++) {
+        LaserPoint point = scan.data[i];
+      }
+
       fflush(stdout);
     } else {
       fprintf(stderr, "Failed to get Lidar Data\n");

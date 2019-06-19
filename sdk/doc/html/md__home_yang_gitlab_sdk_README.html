@@ -94,11 +94,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr>
 <th align="left">Title </th><th align="right">Version </th><th align="center">Data  </th></tr>
 <tr>
-<td align="left">SDK </td><td align="right">1.4.1 </td><td align="center">2019-05-13 </td></tr>
+<td align="left">SDK </td><td align="right">1.4.1 </td><td align="center">2019-06-19 </td></tr>
 </table>
 <ul>
-<li>[fix] fix ignore array</li>
-<li>[fix] Optimize starting point timestamp</li>
+<li>[new feature] increase the deviation between correcting the zero angle of the lidar and the zero angle of the robot.</li>
 </ul>
 <h2>Dataset </h2>
 <table class="doxtable">
@@ -112,12 +111,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <h2>How to build YDLIDAR SDK samples </h2>
 <p>$ git clone <a href="https://github.com/ydlidar/sdk">https://github.com/ydlidar/sdk</a> $ cd sdk $ git checkout R2 $ cd .. $ mkdir build $ cd build $ cmake ../sdk $ make ###linux $ vs open Project.sln ###windows</p>
 <h2>How to run YDLIDAR SDK samples </h2>
-<p>$ cd samples</p>
 <p>linux: </p><pre class="fragment">$ ./ydlidar_test
 $Please enter the lidar serial port:/dev/ttyUSB0
 </pre><p>windows: </p><pre class="fragment">$ ydlidar_test.exe
 $Please enter the lidar serial port:/dev/ttyUSB0
-</pre><p>You should see YDLIDAR's scan result in the console: </p><pre class="fragment">[YDLIDAR]:SDK Version: 1.4.1
+</pre><p>You should see YDLIDAR's scan result in the console: </p><pre class="fragment">[YDLIDAR]:SDK Version: 2.0.8
 [YDLIDAR]:Lidar running correctly ! The health status: good
 [YDLIDAR] Connection established in [/dev/ttyUSB0][230400]:
 Firmware version: 1.2
@@ -125,121 +123,65 @@ Hardware version: 3
 Model: R2
 Serial: 2018101800011111
 [YDLIDAR INFO] Current Sampling Rate : 5K
-[YDLIDAR INFO] Successfully obtained the offset angle[0.0000] from the lidar[2018101800011111]
+[YDLIDAR INFO] Successfully obtained the corrected offset angle[0.0000] from the lidar[2018101800011111]
 [YDLIDAR INFO] Current AngleOffset : 0.000000°
 [YDLIDAR INFO] Current Scan Frequency : 8.000000Hz
 [YDLIDAR INFO] Now YDLIDAR is scanning ......
 Scan received: 625 ranges
 Scan received: 626 ranges
-</pre><p>code: </p><pre class="fragment">    void ParseScan(node_info* data, const size_t&amp; size) {
-
-        double current_frequence, current_distance, current_angle, current_intensity;
-
-        uint64_t current_time_stamp;
-
-        for (size_t i = 0; i &lt; size; i++ ) {
-
-            if( data[i].scan_frequence != 0) {
-
-                current_frequence =  data[i].scan_frequence;//or current_frequence = data[0].scan_frequence
-
-            }
-
-            current_time_stamp = data[i].stamp;
-
-            current_angle = ((data[i].angle_q6_checkbit&gt;&gt;LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT)/64.0f);//LIDAR_RESP_MEASUREMENT_ANGLE_SHIFT equals 8
-
-            current_distance =  data[i].distance_q/4.f;
-
-            current_intensity = (float)(data[i].sync_quality);
-
-        }
-
-        if (current_frequence != 0 ) {
-
-            printf("current lidar scan frequency: %f\n", current_frequence);
-
-        } else {
-
-            printf("Current lidar does not support return scan frequency\n");
-
-        }
-    }
 </pre><h2>Data structure </h2>
-<p>data structure: </p><pre class="fragment">//! A struct for returning configuration from the YDLIDAR
-struct LaserConfig {
+<p>data structure: </p><pre class="fragment">struct LaserPoint {
+    //angle[°]
+    float angle;
+    //range[m]
+    float range;
+    float intensity;
+};
 
+//! A struct for returning configuration from the YDLIDAR
+struct LaserConfig {
     //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
     float min_angle;
-
     //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
     float max_angle;
-
-    //! Scan resolution [rad].
-    float ang_increment;
-
-    //! Scan resoltuion [ns]
+    //! Scan resoltuion [s]
     float time_increment;
-
-    //! Time between scans
+    //! Time between scans[s]
     float scan_time;
-
     //! Minimum range [m]
     float min_range;
-
     //! Maximum range [m]
-    float max_range;
+     float max_range;
+};
 
-    //! Range Resolution [m]
-    float range_res;
-
-  };
-
-
-  struct LaserScan {
-
-    //! Array of ranges
-    std::vector&lt;float&gt; ranges;
-
-    //! Array of intensities
-    std::vector&lt;float&gt; intensities;
-
-    //! Self reported time stamp in nanoseconds
-    uint64_t self_time_stamp;
-
+struct LaserScan {
+     //! Array of laser data point
+    std::vector&lt;LaserPoint&gt; data;
     //! System time when first range was measured in nanoseconds
     uint64_t system_time_stamp;
-
     //! Configuration of scan
     LaserConfig config;
-
-  };
+};
 </pre><p>example angle parsing: </p><pre class="fragment">LaserScan scan;
 
-for(size_t i =0; i &lt; scan.ranges.size(); i++) {
+for(size_t i =0; i &lt; scan.data.size(); i++) {
 
-  // current angle
-  double angle = scan.config.min_angle + i*scan.config.ang_increment;// radian format
+  LaserPoint point = scan.data[i];
+
+  // current time stamp
+  uint64_t time_stamp = scan.system_time_stamp + i * scan.config.time_increment*1e9;
+
+  //current angle
+  double angle = point.angle;//°
 
   //current distance
-  double distance = scan.ranges[i];//meters
+  double distance = point.range;//meters
 
   //current intensity
-  int intensity = scan.intensities[i];
+  double intensity = point.intensity;
 
 }
-</pre><h2>Coordinate System </h2>
-<div class="image">
-<img src="image/image.png"  alt="Coordinate" title="Coordinate"/>
-</div>
-<h3>The relationship between the angle value and the data structure in the above figure:</h3>
-<pre class="fragment">double current_angle =  scan.config.min_angle + index*scan.config.ang_increment;// radian format
-doube Angle = current_angle*180/M_PI;//Angle fomat
-</pre><h2>Upgrade Log </h2>
-<p>2019-05-13 version:1.4.1</p>
-<p>1.fix ignore array</p>
-<p>2.Optimize starting point timestam</p>
-<h2>Contact EAI </h2>
+</pre><h2>Contact EAI </h2>
 <p>If you have any extra questions, please feel free to <a href="http://www.ydlidar.cn/cn/contact">contact us</a> </p>
 </div></div><!-- contents -->
 <!-- start footer part -->

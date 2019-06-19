@@ -96,11 +96,10 @@ typedef enum {
 
 struct node_info {
   uint8_t    sync_flag;  //sync flag
-  uint16_t   sync_quality;//!信号质量
-  uint16_t   angle_q6_checkbit; //!测距点角度
-  uint16_t   distance_q; //! 当前测距点距离
-  uint64_t   stamp; //! 时间戳
-  uint8_t    scan_frequence;//! 特定版本此值才有效,无效值是0
+  uint16_t   sync_quality;//!intensity
+  uint16_t   angle_q6_checkbit; //!angle
+  uint16_t   distance_q; //! distance
+  uint8_t    scan_frequence;//! scan frequency
 } __attribute__((packed)) ;
 
 struct PackageNode {
@@ -130,23 +129,23 @@ struct node_packages {
 
 
 struct device_info {
-  uint8_t   model; ///< 雷达型号
-  uint16_t  firmware_version; ///< 固件版本号
-  uint8_t   hardware_version; ///< 硬件版本号
-  uint8_t   serialnum[16];    ///< 系列号
+  uint8_t   model; ///< lidar model
+  uint16_t  firmware_version; ///< Firmware Major Version
+  uint8_t   hardware_version; ///< Firmware Minjor Version
+  uint8_t   serialnum[16];    ///< serial number
 } __attribute__((packed)) ;
 
 struct device_health {
-  uint8_t   status; ///< 健康状体
-  uint16_t  error_code; ///< 错误代码
+  uint8_t   status; ///< health status
+  uint16_t  error_code; ///< error code
 } __attribute__((packed))  ;
 
 struct sampling_rate {
-  uint8_t rate;	///< 采样频率
+  uint8_t rate;	///< sampling frequency
 } __attribute__((packed))  ;
 
 struct scan_frequency {
-  uint32_t frequency;	///< 扫描频率
+  uint32_t frequency;	///< scanning frequency
 } __attribute__((packed))  ;
 
 struct scan_rotation {
@@ -154,11 +153,11 @@ struct scan_rotation {
 } __attribute__((packed))  ;
 
 struct scan_exposure {
-  uint8_t exposure;	///< 低光功率模式
+  uint8_t exposure;	///<
 } __attribute__((packed))  ;
 
 struct scan_heart_beat {
-  uint8_t enable;	///< 掉电保护状态
+  uint8_t enable;	///<
 } __attribute__((packed));
 
 struct scan_points {
@@ -192,45 +191,55 @@ struct lidar_ans_header {
 #pragma pack()
 #endif
 
+struct LaserPoint {
+  float angle;
+  float range;
+  float intensity;
+  LaserPoint &operator = (const LaserPoint &data) {
+    angle = data.angle;
+    range = data.range;
+    intensity = data.intensity;
+    return *this;
+  }
+};
+
 //! A struct for returning configuration from the YDLIDAR
 struct LaserConfig {
   //! Start angle for the laser scan [rad].  0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float min_angle;
   //! Stop angle for the laser scan [rad].   0 is forward and angles are measured clockwise when viewing YDLIDAR from the top.
   float max_angle;
-  //! Scan resolution [rad].
-  float ang_increment;
   //! Scan resoltuion [s]
   float time_increment;
-  //! Time between scans[s]
+  //! Time between scans
   float scan_time;
   //! Minimum range [m]
   float min_range;
   //! Maximum range [m]
   float max_range;
-  //! Range Resolution [m]
-  float range_res;
+  LaserConfig &operator = (const LaserConfig &data) {
+    min_angle = data.min_angle;
+    max_angle = data.max_angle;
+    time_increment = data.time_increment;
+    scan_time = data.scan_time;
+    min_range = data.min_range;
+    max_range = data.max_range;
+    return *this;
+  }
 };
 
 
-//! A struct for returning laser readings from the YDLIDAR
-//! currentAngle = min_angle + ang_increment*index
-//! for( int i =0; i < ranges.size(); i++) {
-//!     double currentAngle = config.min_angle + i*config.ang_increment;
-//!     double currentDistance = ranges[i];
-//! }
-//!
-//!
-//!
 struct LaserScan {
-  //! Array of ranges
-  std::vector<float> ranges;
-  //! Array of intensities
-  std::vector<float> intensities;
-  //! Self reported time stamp in nanoseconds
-  uint64_t self_time_stamp;
+  //! Array of laser point
+  std::vector<LaserPoint> data;
   //! System time when first range was measured in nanoseconds
   uint64_t system_time_stamp;
   //! Configuration of scan
   LaserConfig config;
+  LaserScan &operator = (const LaserScan &data) {
+    this->data = data.data;
+    system_time_stamp = data.system_time_stamp;
+    config = data.config;
+    return *this;
+  }
 };
