@@ -97,13 +97,6 @@ int Serial::waitfordata(size_t data_count, uint32_t timeout, size_t *returned_si
   return pimpl_->waitfordata(data_count, timeout, returned_size);
 }
 
-size_t Serial::writeData(const uint8_t *data, size_t size) {
-  return write(data, size);
-}
-
-size_t Serial::readData(uint8_t *data, size_t size) {
-  return read(data, size);
-}
 
 size_t Serial::read_(uint8_t *buffer, size_t size) {
   return this->pimpl_->read(buffer, size);

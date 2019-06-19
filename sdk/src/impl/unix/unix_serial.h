@@ -24,7 +24,7 @@ class MillisecondTimer {
   timespec expiry;
 };
 
-class Serial::SerialImpl {
+class serial::Serial::SerialImpl {
  public:
   explicit SerialImpl(const string &port,
                       unsigned long baudrate,

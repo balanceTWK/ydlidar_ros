@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8)
-#add_definitions(-std=c++11) # Use C++11
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 include_directories(include)
 include_directories(src)
@@ -25,11 +24,15 @@ FILE(GLOB SDK_SRC
 	
 ENDIF()
 
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
+
+
 add_subdirectory(samples)
 
-add_library(ydlidar_driver SHARED ${SDK_SRC})
+add_library(ydlidar_driver STATIC ${SDK_SRC})
 IF (WIN32)
-target_link_libraries(ydlidar_driver setupapi Winmm)
+target_link_libraries(ydlidar_driver setupapi)
 ELSE()
 target_link_libraries(ydlidar_driver rt pthread)
 ENDIF()                    

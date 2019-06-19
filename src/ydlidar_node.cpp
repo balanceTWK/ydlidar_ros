@@ -42,9 +42,7 @@ int main(int argc, char * argv[]) {
     fflush(stdout);
   
     std::string port;
-    int baudrate=230400;
-    bool intensities = false;
-    int samp_rate = 5;
+    int baudrate=115200;
     std::string frame_id;
     bool reversion, resolution_fixed;
     bool auto_reconnect;
@@ -53,7 +51,6 @@ int main(int argc, char * argv[]) {
     std::string list;
     std::vector<float> ignore_array;  
     double max_range, min_range;
-    double frequency;
     bool sun_noise, glass_noise;
     int max_abnormal_check_count;
     double OffsetTime = 0.0;
@@ -67,12 +64,11 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("auto_reconnect", auto_reconnect, "true");
     nh_private.param<bool>("sun_noise", sun_noise, "true");
     nh_private.param<bool>("glass_noise", glass_noise, "true");
-    nh_private.param<bool>("reversion", reversion, "true");
+    nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
-    nh_private.param<double>("range_max", max_range , 16.0);
+    nh_private.param<double>("range_max", max_range , 6.0);
     nh_private.param<double>("range_min", min_range , 0.08);
-    nh_private.param<double>("frequency", frequency , 10.0);
     nh_private.param<double>("OffsetTime", OffsetTime , 0.0);
     nh_private.param<int>("max_abnormal_check_count", max_abnormal_check_count , 2);
     nh_private.param<std::string>("ignore_array",list,"");
@@ -83,18 +79,12 @@ int main(int argc, char * argv[]) {
     }
 
     for(uint16_t i =0 ; i < ignore_array.size();i++){
-        if(ignore_array[i] < 0 && ignore_array[i] > 360){
-            ROS_ERROR_STREAM("ignore array should be between 0 and 360");
+        if(ignore_array[i] < -180 && ignore_array[i] > 180){
+            ROS_ERROR_STREAM("ignore array should be between -180 and 180");
         }
     }
 
     CYdLidar laser;
-    if(frequency<5){
-       frequency = 7.0; 
-    }
-    if(frequency>12){
-        frequency = 12;
-    }
     if(angle_max < angle_min){
         double temp = angle_max;
         angle_max = angle_min;
@@ -107,7 +97,6 @@ int main(int argc, char * argv[]) {
     ROS_INFO("[YDLIDAR INFO] Now YDLIDAR ROS SDK VERSION:%s .......", ROSVerision);
     laser.setSerialPort(port);
     laser.setSerialBaudrate(baudrate);
-    laser.setIntensities(intensities);
     laser.setMaxRange(max_range);
     laser.setMinRange(min_range);
     laser.setMaxAngle(angle_max);
@@ -116,8 +105,6 @@ int main(int argc, char * argv[]) {
     laser.setAutoReconnect(auto_reconnect);
     laser.setSunNoise(sun_noise);
     laser.setGlassNoise(glass_noise);
-    laser.setScanFrequency(frequency);
-    laser.setSampleRate(samp_rate);
     laser.setAbnormalCheckCount(max_abnormal_check_count);
     laser.setIgnoreArray(ignore_array);
     laser.setOffsetTime(OffsetTime);
