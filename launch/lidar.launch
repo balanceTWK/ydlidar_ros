@@ -10,7 +10,7 @@
     <param name="angle_min"    type="double" value="-180" />
     <param name="angle_max"    type="double" value="180" />
     <param name="range_min"    type="double" value="0.1" />
-    <param name="range_max"    type="double" value="6.0" />
+    <param name="range_max"    type="double" value="12.0" />
     <param name="ignore_array" type="string" value="" />
     <param name="max_abnormal_check_count"    type="int" value="2"/>
   </node>

@@ -71,7 +71,7 @@ range_min (double, default: 0.08)
 
     Min valid range (m) for LIDAR data.
 
-range_max (double, default: 6.0)
+range_max (double, default: 12.0)
 
     Max valid range (m) for LIDAR data.
 

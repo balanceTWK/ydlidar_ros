@@ -67,7 +67,7 @@ int main(int argc, char * argv[]) {
     nh_private.param<bool>("reversion", reversion, "false");
     nh_private.param<double>("angle_max", angle_max , 180);
     nh_private.param<double>("angle_min", angle_min , -180);
-    nh_private.param<double>("range_max", max_range , 6.0);
+    nh_private.param<double>("range_max", max_range , 12.0);
     nh_private.param<double>("range_min", min_range , 0.08);
     nh_private.param<double>("OffsetTime", OffsetTime , 0.0);
     nh_private.param<int>("max_abnormal_check_count", max_abnormal_check_count , 2);
