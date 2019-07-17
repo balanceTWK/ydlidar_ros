@@ -17,7 +17,7 @@
 
 using namespace ydlidar;
 
-#define ROSVerision "1.4.1"
+#define ROSVerision "1.4.2"
 
 
 std::vector<float> split(const std::string &s, char delim) {
@@ -130,7 +130,7 @@ int main(int argc, char * argv[]) {
             scan_msg.header.frame_id = frame_id;
             scan_msg.angle_min =(scan.config.min_angle);
             scan_msg.angle_max = (scan.config.max_angle);
-            scan_msg.angle_increment = (scan.config.ang_increment);
+            scan_msg.angle_increment = (scan.config.angle_increment);
             scan_msg.scan_time = scan.config.scan_time;
             scan_msg.time_increment = scan.config.time_increment;
             scan_msg.range_min = (scan.config.min_range);
