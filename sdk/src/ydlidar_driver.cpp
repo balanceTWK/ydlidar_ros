@@ -1128,6 +1128,7 @@ void YDlidarDriver::checkTransTime() {
       break;
 
     case YDLIDAR_G4://g4
+    case YDLIDAR_G4PRO://x4
       if (m_sampling_rate == -1) {
         sampling_rate _rate;
         getSamplingRate(_rate);
@@ -1149,10 +1150,6 @@ void YDlidarDriver::checkTransTime() {
 
     case YDLIDAR_X4://x4
       m_pointTime = 1e9 / 5000;
-      break;
-
-    case YDLIDAR_G4PRO://x4
-      m_pointTime = 1e9 / 4000;
       break;
 
     case YDLIDAR_F4PRO://f4pro

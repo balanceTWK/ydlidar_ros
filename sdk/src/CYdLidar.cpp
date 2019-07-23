@@ -403,6 +403,7 @@ bool CYdLidar::getDeviceInfo(int &type)
 		break;
 
 	case YDlidarDriver::YDLIDAR_G4:
+	case YDlidarDriver::YDLIDAR_G4PRO:
 	{
 		model = "G4";
 		ans = lidarPtr->getSamplingRate(_rate);
@@ -474,11 +475,6 @@ bool CYdLidar::getDeviceInfo(int &type)
 	case YDlidarDriver::YDLIDAR_X4:
 		model = "X4";
 		break;
-
-	case YDlidarDriver::YDLIDAR_G4PRO:
-		model = "G4Pro";
-		break;
-
 	case YDlidarDriver::YDLIDAR_F4PRO:
 	{
 		model = "F4Pro";
@@ -656,6 +652,7 @@ bool CYdLidar::getDeviceInfo(int &type)
 
 
 	if (devinfo.model == YDlidarDriver::YDLIDAR_G4 ||
+		devinfo.model == YDlidarDriver::YDLIDAR_G4PRO ||
 		devinfo.model == YDlidarDriver::YDLIDAR_F4PRO ||
 		devinfo.model == YDlidarDriver::YDLIDAR_G4C ||
 		devinfo.model == YDlidarDriver::YDLIDAR_G10 ||
